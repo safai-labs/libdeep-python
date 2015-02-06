@@ -73,6 +73,43 @@ static PyObject* layers(PyObject* self, PyObject* args)
     return Py_BuildValue("i", learner.net->HiddenLayers);
 }
 
+static PyObject* setErrorThresholds(PyObject* self, PyObject* args)
+{    
+    PyObject *obj;
+    int index = 0;
+
+    if (!PyArg_ParseTuple(args, "O", &obj)) {
+        return Py_BuildValue("i", -1);  
+    }
+
+    PyObject *iter = PyObject_GetIter(obj);
+    if (!iter) {
+        return Py_BuildValue("i", -2);  
+    }
+
+    while (1) {     
+        PyObject *next = PyIter_Next(iter);
+        if (!next) {
+            // nothing left in the iterator
+            break;
+        }
+
+        if (index >= 20) {
+            return Py_BuildValue("i", -3);
+        }
+        
+        if (!PyFloat_Check(next)) {
+            // error, we were expecting a floating point value
+            return Py_BuildValue("i", -4);  
+        }
+
+		error_threshold[index] = (float)PyFloat_AsDouble(next);;
+        index++;
+    }
+    
+    return Py_BuildValue("i", 0);
+}
+
 /* sets an error threshold for training a layer */
 static PyObject* setErrorThreshold(PyObject* self, PyObject* args)
 {
@@ -386,6 +423,7 @@ static PyMethodDef DeeplearnMethods[] =
     {"setLearningRate", setLearningRate, METH_VARARGS, "Sets the leraning rate in the range 0.0 - 1.0"},
     {"setDropoutsPercent", setDropoutsPercent, METH_VARARGS, "Sets the percentage of dropouts"},
     {"setErrorThreshold", setErrorThreshold, METH_VARARGS, "Sets the error threshold for training a layer"},
+    {"setErrorThresholds", setErrorThresholds, METH_VARARGS, "Sets the training error thresholds from a list"},
     {"feedForward", feedForward, METH_VARARGS, "Perform network feed forward"},
     {"update", update, METH_VARARGS, "Update the network"},
     {"setInput", setInput, METH_VARARGS, "Sets the value of an input"},
