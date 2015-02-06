@@ -191,6 +191,51 @@ static PyObject* setInput(PyObject* self, PyObject* args)
     return Py_BuildValue("i", 0);
 }
 
+static PyObject* setInputs(PyObject* self, PyObject* args)
+{    
+	PyObject *obj;
+	int index = 0;
+
+    if (initialised == 0) {
+        return Py_BuildValue("i", -1);  
+    }
+
+	if (!PyArg_ParseTuple(args, "O", &obj)) {
+        return Py_BuildValue("i", -2);  
+	}
+
+	PyObject *iter = PyObject_GetIter(obj);
+	if (!iter) {
+        return Py_BuildValue("i", -3);  
+	}
+
+	while (1) {		
+		PyObject *next = PyIter_Next(iter);
+		if (!next) {
+			// nothing left in the iterator
+			break;
+		}
+
+		if (index >= learner.net->NoOfInputs) {
+			return Py_BuildValue("i", -4);
+		}
+		
+		if (!PyFloat_Check(next)) {
+			// error, we were expecting a floating point value
+			return Py_BuildValue("i", -5);  
+		}
+
+		double value = PyFloat_AsDouble(next);
+		deeplearn_set_input(&learner, index, (float)value);
+		index++;
+	}
+	if (index != learner.net->NoOfInputs) {
+		return Py_BuildValue("i", -6);
+	}
+	
+    return Py_BuildValue("i", 0);
+}
+
 static PyObject* setOutput(PyObject* self, PyObject* args)
 {
     int index=0;
@@ -204,6 +249,51 @@ static PyObject* setOutput(PyObject* self, PyObject* args)
         return Py_BuildValue("i", -2);
 
     deeplearn_set_output(&learner, index, value);
+    return Py_BuildValue("i", 0);
+}
+
+static PyObject* setOutputs(PyObject* self, PyObject* args)
+{    
+	PyObject *obj;
+	int index = 0;
+
+    if (initialised == 0) {
+        return Py_BuildValue("i", -1);  
+    }
+
+	if (!PyArg_ParseTuple(args, "O", &obj)) {
+        return Py_BuildValue("i", -2);  
+	}
+
+	PyObject *iter = PyObject_GetIter(obj);
+	if (!iter) {
+        return Py_BuildValue("i", -3);  
+	}
+
+	while (1) {		
+		PyObject *next = PyIter_Next(iter);
+		if (!next) {
+			// nothing left in the iterator
+			break;
+		}
+
+		if (index >= learner.net->NoOfOutputs) {
+			return Py_BuildValue("i", -4);
+		}
+		
+		if (!PyFloat_Check(next)) {
+			// error, we were expecting a floating point value
+			return Py_BuildValue("i", -5);  
+		}
+
+		double value = PyFloat_AsDouble(next);
+		deeplearn_set_output(&learner, index, (float)value);
+		index++;
+	}
+	if (index != learner.net->NoOfOutputs) {
+		return Py_BuildValue("i", -6);
+	}
+	
     return Py_BuildValue("i", 0);
 }
 
@@ -277,7 +367,9 @@ static PyMethodDef DeeplearnMethods[] =
     {"feedForward", feedForward, METH_VARARGS, "Perform network feed forward"},
     {"update", update, METH_VARARGS, "Update the network"},
     {"setInput", setInput, METH_VARARGS, "Sets the value of an input"},
+    {"setInputs", setInputs, METH_VARARGS, "Sets the inputs from an array of floats"},
     {"setOutput", setOutput, METH_VARARGS, "Sets the desired value of an output"},
+    {"setOutputs", setOutputs, METH_VARARGS, "Sets the desired outputs from an array of floats"},
     {"save", save, METH_VARARGS, "Save the network"},
     {"load", load, METH_VARARGS, "Load a network"},
     {"plotHistory", plotHistory, METH_VARARGS, "Plots the training history"},
