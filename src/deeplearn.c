@@ -41,6 +41,22 @@ static float error_threshold[] = {
     0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 };
 
+static PyObject* currentLayer(PyObject* self, PyObject* args)
+{
+    if (initialised == 0) {
+        return Py_BuildValue("i", -1);
+    }
+    return Py_BuildValue("i", learner.current_hidden_layer);
+}
+
+static PyObject* backpropError(PyObject* self, PyObject* args)
+{
+    if (initialised == 0) {
+        return Py_BuildValue("i", -1);
+    }
+    return Py_BuildValue("f", learner.BPerror);
+}
+
 static PyObject* inputs(PyObject* self, PyObject* args)
 {
     if (initialised == 0) {
@@ -434,6 +450,8 @@ static PyMethodDef DeeplearnMethods[] =
     {"save", save, METH_VARARGS, "Save the network"},
     {"load", load, METH_VARARGS, "Load a network"},
     {"plotHistory", plotHistory, METH_VARARGS, "Plots the training history"},
+    {"currentLayer", currentLayer, METH_VARARGS, "Returns the index of the hidden layer currently being pre-trained"},
+    {"backpropError", backpropError, METH_VARARGS, "Returns backprop error for the network"},
     {"inputs", inputs, METH_VARARGS, "Returns the number of inputs"},
     {"outputs", outputs, METH_VARARGS, "Returns the number of outputs"},
     {"hiddens", hiddens, METH_VARARGS, "Returns the number of hidden units per layer"},
