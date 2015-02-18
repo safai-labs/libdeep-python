@@ -1,7 +1,6 @@
 /*
  libdeep-python - Python interface for libdeep
  Copyright (C) 2015  Bob Mottram <bob@robotics.uk.to>
-
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions
  are met:
@@ -337,45 +336,42 @@ static PyObject* setPlotTitle(PyObject* self, PyObject* args)
 static PyObject* readCsvFile(PyObject* self, PyObject* args)
 {
     PyObject *obj;
-    int index=0, retval;
+    int retval;
     char * filename;
-        int no_of_hiddens, hidden_layers, no_of_outputs=0;
-        int output_field_index[256];
-        
-    if (initialised == 0) {
-        return Py_BuildValue("i", -1);  
-    }
-    if (!PyArg_ParseTuple(args, "siiO", &filename, &no_of_hiddens, &hidden_layers, &output_field_index))
-        return Py_BuildValue("i", -2);
+    int no_of_hiddens, hidden_layers, no_of_outputs=0;
+    int output_field_index[256];
 
-        /* get the field indexes of outputs */
+    if (!PyArg_ParseTuple(args, "siiO", &filename, &no_of_hiddens, &hidden_layers, &obj))
+        return Py_BuildValue("i", -1);
+
+    initialised = 1;
+    
+    /* get the field indexes of outputs */
     PyObject *iter = PyObject_GetIter(obj);
     if (!iter) {
-        return Py_BuildValue("i", -3);  
+        return Py_BuildValue("i", -2);  
     }
 
     while (1) {     
         PyObject *next = PyIter_Next(iter);
         if (!next) {
-            // nothing left in the iterator
+            /* nothing left in the iterator */
             break;
         }
-
-        if (index >= learner.net->NoOfOutputs) {
-            return Py_BuildValue("i", -4);
-        }
-        
-        if (!PyFloat_Check(next)) {
-            // error, we were expecting a floating point value
-            return Py_BuildValue("i", -5);  
+	
+        if (!PyInt_Check(next)) {
+            /* error, we were expecting an integer value */
+            return Py_BuildValue("i", -4);  
         }
 
-        output_field_index[no_of_outputs] = (int)PyFloat_AsDouble(next);
-        no_of_outputs++;
+        output_field_index[no_of_outputs++] = (int)PyInt_AsLong(next);
+    }
+
+    if (no_of_outputs == 0) {
+        return Py_BuildValue("i", -5);  
     }
         
-    retval = deeplearndata_read_csv(filename,
-                                    &learner,
+    retval = deeplearndata_read_csv(filename, &learner,
                                     no_of_hiddens, hidden_layers,
                                     no_of_outputs,
                                     output_field_index,
@@ -510,6 +506,26 @@ static PyObject* plotHistory(PyObject* self, PyObject* args)
     return Py_BuildValue("i", retval);
 }
 
+/* performs a single training step */
+static PyObject* training(PyObject* self, PyObject* args)
+{
+    if (initialised == 0) {
+        return Py_BuildValue("i", -1);  
+    }
+
+    return Py_BuildValue("i", deeplearndata_training(&learner));
+}
+
+/* returns the test set performance as a percentage */
+static PyObject* getPerformance(PyObject* self, PyObject* args)
+{
+    if (initialised == 0) {
+        return Py_BuildValue("i", -1);  
+    }
+
+    return Py_BuildValue("f", deeplearndata_get_performance(&learner));
+}
+
 /*  define functions in module */
 static PyMethodDef DeeplearnMethods[] =
 {
@@ -535,9 +551,11 @@ static PyMethodDef DeeplearnMethods[] =
     {"outputs", outputs, METH_VARARGS, "Returns the number of outputs"},
     {"hiddens", hiddens, METH_VARARGS, "Returns the number of hidden units per layer"},
     {"layers", layers, METH_VARARGS, "Returns the number of hidden layers"},
-    {"readCsvFile", layers, METH_VARARGS, "Reads the data from a csv file"},
-    {"setHistoryPlotInterval", layers, METH_VARARGS, "Sets the number of time steps after which to update the training history"},
-    {"setPlotTitle", layers, METH_VARARGS, "Sets the title of the training history graph"},
+    {"readCsvFile", readCsvFile, METH_VARARGS, "Reads the data from a csv file"},
+    {"setHistoryPlotInterval", setHistoryPlotInterval, METH_VARARGS, "Sets the number of time steps after which to update the training history"},
+    {"setPlotTitle", setPlotTitle, METH_VARARGS, "Sets the title of the training history graph"},
+    {"training", training, METH_VARARGS, "Performs a training step"},
+    {"getPerformance", getPerformance, METH_VARARGS, "Returns the test set performance as a percentage"},
     {NULL, NULL, 0, NULL}
 };
 
