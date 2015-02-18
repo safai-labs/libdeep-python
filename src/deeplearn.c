@@ -33,6 +33,7 @@
 #include <Python.h>
 #include <libdeep/globals.h>
 #include <libdeep/deeplearn.h>
+#include <libdeep/deeplearndata.h>
 
 static int initialised = 0;
 static deeplearn learner;
@@ -321,7 +322,6 @@ static PyObject* setHistoryPlotInterval(PyObject* self, PyObject* args)
 
 static PyObject* setPlotTitle(PyObject* self, PyObject* args)
 {
-    int interval=0;
     char * title;
     
     if (initialised == 0) {
@@ -337,18 +337,18 @@ static PyObject* setPlotTitle(PyObject* self, PyObject* args)
 static PyObject* readCsvFile(PyObject* self, PyObject* args)
 {
     PyObject *obj;
-    int interval=0, index=0, retval;
+    int index=0, retval;
     char * filename;
-	int no_of_hiddens, hidden_layers, no_of_outputs=0;
-	int output_field_index[256];
-	
+        int no_of_hiddens, hidden_layers, no_of_outputs=0;
+        int output_field_index[256];
+        
     if (initialised == 0) {
         return Py_BuildValue("i", -1);  
     }
     if (!PyArg_ParseTuple(args, "siiO", &filename, &no_of_hiddens, &hidden_layers, &output_field_index))
         return Py_BuildValue("i", -2);
 
-	/* get the field indexes of outputs */
+        /* get the field indexes of outputs */
     PyObject *iter = PyObject_GetIter(obj);
     if (!iter) {
         return Py_BuildValue("i", -3);  
@@ -373,14 +373,14 @@ static PyObject* readCsvFile(PyObject* self, PyObject* args)
         output_field_index[no_of_outputs] = (int)PyFloat_AsDouble(next);
         no_of_outputs++;
     }
-	
+        
     retval = deeplearndata_read_csv(filename,
-									&learner,
-									no_of_hiddens, hidden_layers,
-									no_of_outputs,
-									output_field_index,
-									error_threshold,
-									&random_seed);
+                                    &learner,
+                                    no_of_hiddens, hidden_layers,
+                                    no_of_outputs,
+                                    output_field_index,
+                                    error_threshold,
+                                    &random_seed);
     return Py_BuildValue("i", retval);
 }
 
@@ -536,8 +536,8 @@ static PyMethodDef DeeplearnMethods[] =
     {"hiddens", hiddens, METH_VARARGS, "Returns the number of hidden units per layer"},
     {"layers", layers, METH_VARARGS, "Returns the number of hidden layers"},
     {"readCsvFile", layers, METH_VARARGS, "Reads the data from a csv file"},
-	static PyObject* readCsvFile(PyObject* self, PyObject* args)
-
+    {"setHistoryPlotInterval", layers, METH_VARARGS, "Sets the number of time steps after which to update the training history"},
+    {"setPlotTitle", layers, METH_VARARGS, "Sets the title of the training history graph"},
     {NULL, NULL, 0, NULL}
 };
 
