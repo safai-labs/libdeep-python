@@ -119,7 +119,7 @@ static PyObject* setErrorThresholds(PyObject* self, PyObject* args)
             return Py_BuildValue("i", -4);  
         }
 
-		error_threshold[index] = (float)PyFloat_AsDouble(next);;
+        error_threshold[index] = (float)PyFloat_AsDouble(next);;
         index++;
     }
     
@@ -305,6 +305,85 @@ static PyObject* setOutput(PyObject* self, PyObject* args)
     return Py_BuildValue("i", 0);
 }
 
+static PyObject* setHistoryPlotInterval(PyObject* self, PyObject* args)
+{
+    int interval=0;
+    
+    if (initialised == 0) {
+        return Py_BuildValue("i", -1);  
+    }
+    if (!PyArg_ParseTuple(args, "i", &interval))
+        return Py_BuildValue("i", -2);
+
+    learner.history_plot_interval = interval;
+    return Py_BuildValue("i", 0);
+}
+
+static PyObject* setPlotTitle(PyObject* self, PyObject* args)
+{
+    int interval=0;
+    char * title;
+    
+    if (initialised == 0) {
+        return Py_BuildValue("i", -1);  
+    }
+    if (!PyArg_ParseTuple(args, "s", &title))
+        return Py_BuildValue("i", -2);
+
+    sprintf(learner.history_plot_title,"%s",title);
+    return Py_BuildValue("i", 0);
+}
+
+static PyObject* readCsvFile(PyObject* self, PyObject* args)
+{
+    PyObject *obj;
+    int interval=0, index=0, retval;
+    char * filename;
+	int no_of_hiddens, hidden_layers, no_of_outputs=0;
+	int output_field_index[256];
+	
+    if (initialised == 0) {
+        return Py_BuildValue("i", -1);  
+    }
+    if (!PyArg_ParseTuple(args, "siiO", &filename, &no_of_hiddens, &hidden_layers, &output_field_index))
+        return Py_BuildValue("i", -2);
+
+	/* get the field indexes of outputs */
+    PyObject *iter = PyObject_GetIter(obj);
+    if (!iter) {
+        return Py_BuildValue("i", -3);  
+    }
+
+    while (1) {     
+        PyObject *next = PyIter_Next(iter);
+        if (!next) {
+            // nothing left in the iterator
+            break;
+        }
+
+        if (index >= learner.net->NoOfOutputs) {
+            return Py_BuildValue("i", -4);
+        }
+        
+        if (!PyFloat_Check(next)) {
+            // error, we were expecting a floating point value
+            return Py_BuildValue("i", -5);  
+        }
+
+        output_field_index[no_of_outputs] = (int)PyFloat_AsDouble(next);
+        no_of_outputs++;
+    }
+	
+    retval = deeplearndata_read_csv(filename,
+									&learner,
+									no_of_hiddens, hidden_layers,
+									no_of_outputs,
+									output_field_index,
+									error_threshold,
+									&random_seed);
+    return Py_BuildValue("i", retval);
+}
+
 static PyObject* getOutput(PyObject* self, PyObject* args)
 {
     int index=0;
@@ -456,6 +535,9 @@ static PyMethodDef DeeplearnMethods[] =
     {"outputs", outputs, METH_VARARGS, "Returns the number of outputs"},
     {"hiddens", hiddens, METH_VARARGS, "Returns the number of hidden units per layer"},
     {"layers", layers, METH_VARARGS, "Returns the number of hidden layers"},
+    {"readCsvFile", layers, METH_VARARGS, "Reads the data from a csv file"},
+	static PyObject* readCsvFile(PyObject* self, PyObject* args)
+
     {NULL, NULL, 0, NULL}
 };
 
