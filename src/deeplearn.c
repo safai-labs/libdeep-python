@@ -358,7 +358,7 @@ static PyObject* readCsvFile(PyObject* self, PyObject* args)
             /* nothing left in the iterator */
             break;
         }
-	
+        
         if (!PyInt_Check(next)) {
             /* error, we were expecting an integer value */
             return Py_BuildValue("i", -4);  
@@ -526,6 +526,20 @@ static PyObject* getPerformance(PyObject* self, PyObject* args)
     return Py_BuildValue("f", deeplearndata_get_performance(&learner));
 }
 
+static PyObject* export(PyObject* self, PyObject* args)
+{
+    char * filename;
+
+    if (initialised == 0) {
+        return Py_BuildValue("i", -1);  
+    }
+
+    if (!PyArg_ParseTuple(args, "s", &filename))
+        return Py_BuildValue("i", -2);
+
+    return Py_BuildValue("f", deeplearn_export(&learner, filename));
+}
+
 /*  define functions in module */
 static PyMethodDef DeeplearnMethods[] =
 {
@@ -556,6 +570,7 @@ static PyMethodDef DeeplearnMethods[] =
     {"setPlotTitle", setPlotTitle, METH_VARARGS, "Sets the title of the training history graph"},
     {"training", training, METH_VARARGS, "Performs a training step"},
     {"getPerformance", getPerformance, METH_VARARGS, "Returns the test set performance as a percentage"},
+    {"export", export, METH_VARARGS, "Exports the trained network as a standalone C program"},
     {NULL, NULL, 0, NULL}
 };
 
