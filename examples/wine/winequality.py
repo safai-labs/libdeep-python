@@ -4,7 +4,7 @@ import sys
 import deeplearn
 
 # Reads a number of data samples from a CSV file
-# where the expected output value is the second field (index 1)
+# where the expected output value is the 12th field (index 11)
 noOfSamples = deeplearn.readCsvFile("winequality-white.csv", 10, 3, [11])
 print str(noOfSamples) + " samples loaded"
 

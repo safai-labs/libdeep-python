@@ -4,7 +4,7 @@ import sys
 import deeplearn
 
 # Reads a number of data samples from a CSV file
-# where the expected output value is the second field (index 1)
+# where the expected output values are within field indexes 7,8,9 and 10
 noOfSamples = deeplearn.readCsvFile("slump_test.data", 16, 3, [7,8,9,10])
 print str(noOfSamples) + " samples loaded"
 
