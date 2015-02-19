@@ -106,7 +106,7 @@ static PyObject* setErrorThresholds(PyObject* self, PyObject* args)
     while (1) {     
         PyObject *next = PyIter_Next(iter);
         if (!next) {
-            // nothing left in the iterator
+            /* nothing left in the iterator */
             break;
         }
 
@@ -115,7 +115,7 @@ static PyObject* setErrorThresholds(PyObject* self, PyObject* args)
         }
         
         if (!PyFloat_Check(next)) {
-            // error, we were expecting a floating point value
+            /* error, we were expecting a floating point value */
             return Py_BuildValue("i", -4);  
         }
 
@@ -265,7 +265,7 @@ static PyObject* setInputs(PyObject* self, PyObject* args)
     while (1) {     
         PyObject *next = PyIter_Next(iter);
         if (!next) {
-            // nothing left in the iterator
+            /* nothing left in the iterator */
             break;
         }
 
@@ -274,7 +274,7 @@ static PyObject* setInputs(PyObject* self, PyObject* args)
         }
         
         if (!PyFloat_Check(next)) {
-            // error, we were expecting a floating point value
+            /* error, we were expecting a floating point value */
             return Py_BuildValue("i", -5);  
         }
 
@@ -423,7 +423,7 @@ static PyObject* setOutputs(PyObject* self, PyObject* args)
     while (1) {     
         PyObject *next = PyIter_Next(iter);
         if (!next) {
-            // nothing left in the iterator
+            /* nothing left in the iterator */
             break;
         }
 
@@ -432,7 +432,7 @@ static PyObject* setOutputs(PyObject* self, PyObject* args)
         }
         
         if (!PyFloat_Check(next)) {
-            // error, we were expecting a floating point value
+            /* error, we were expecting a floating point value */
             return Py_BuildValue("i", -5);  
         }
 
