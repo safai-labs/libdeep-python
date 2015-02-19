@@ -7,7 +7,7 @@ import deeplearn
 noOfSamples = deeplearn.readCsvFile("wdbc.data", 16, 3, [1])
 print str(noOfSamples) + " samples loaded"
 
-deeplearn.setErrorThresholds([3.0, 0.6, 0.6, 3.0])
+deeplearn.setErrorThresholds([1.6, 0.6, 0.6, 3.0])
 deeplearn.setLearningRate(0.2)
 deeplearn.setDropoutsPercent(0.001)
 deeplearn.setHistoryPlotInterval(50000)

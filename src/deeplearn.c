@@ -37,9 +37,18 @@
 static int initialised = 0;
 static deeplearn learner;
 static unsigned int random_seed = 46362;
-static float error_threshold[] = {
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-};
+static float error_threshold[256];
+
+static PyObject* getErrorThreshold(PyObject* self, PyObject* args)
+{
+    int index=0;
+    if (initialised == 0) {
+        return Py_BuildValue("i", -1);
+    }
+    if (!PyArg_ParseTuple(args, "i", &index))
+        return Py_BuildValue("i", -2);
+    return Py_BuildValue("f", deeplearn_get_error_threshold(&learner,index));
+}
 
 static PyObject* currentLayer(PyObject* self, PyObject* args)
 {
@@ -119,7 +128,7 @@ static PyObject* setErrorThresholds(PyObject* self, PyObject* args)
             return Py_BuildValue("i", -4);  
         }
 
-        error_threshold[index] = (float)PyFloat_AsDouble(next);;
+	deeplearn_set_error_threshold(&learner, index, (float)PyFloat_AsDouble(next));
         index++;
     }
     
@@ -137,7 +146,7 @@ static PyObject* setErrorThreshold(PyObject* self, PyObject* args)
     }
     if (!PyArg_ParseTuple(args, "if", &layer_index, &threshold))
         return Py_BuildValue("i", -2);
-    error_threshold[layer_index] = threshold;
+    deeplearn_set_error_threshold(&learner, layer_index, threshold);
     return Py_BuildValue("i", 0);
 }
 
@@ -571,6 +580,7 @@ static PyMethodDef DeeplearnMethods[] =
     {"training", training, METH_VARARGS, "Performs a training step"},
     {"getPerformance", getPerformance, METH_VARARGS, "Returns the test set performance as a percentage"},
     {"export", export, METH_VARARGS, "Exports the trained network as a standalone C program"},
+    {"getErrorThreshold", getErrorThreshold, METH_VARARGS, "Returns an error threshold for the given layer"},
     {NULL, NULL, 0, NULL}
 };
 
