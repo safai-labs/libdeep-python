@@ -10,7 +10,7 @@ print str(noOfSamples) + " samples loaded"
 deeplearn.setErrorThresholds([1.6, 0.6, 0.6, 3.0])
 deeplearn.setLearningRate(0.2)
 deeplearn.setDropoutsPercent(0.001)
-deeplearn.setHistoryPlotInterval(50000)
+deeplearn.setHistoryPlotInterval(500000)
 deeplearn.setPlotTitle("Cancer Classification Training")
 
 print "Training started"
