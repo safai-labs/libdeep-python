@@ -27,14 +27,4 @@ sudo make install
 Usage
 -----
 
-Enter Python's interactive console by typing "python", then import the deep learning module:
-
-````
-import deeplearn
-````
-
-To create a neural net with 20 inputs, 10 hidden units per layer, 3 hidden layers and 5 outputs:
-
-````
-deeplearn.init(20,10,3,5)
-````
+For example use cases see the examples directory.
