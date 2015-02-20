@@ -12,7 +12,7 @@ print str(noOfSamples) + " samples loaded"
 # Three hidden layers, plus the final training.
 # After going below the threshold the pre-training will move
 # on to the next layer
-deeplearn.setErrorThresholds([0.5, 0.5, 0.5, 9.0])
+deeplearn.setErrorThresholds([1.6, 1.6, 3.8, 9.5])
 
 # The learning rate in the range 0.0-1.0
 deeplearn.setLearningRate(0.5)
