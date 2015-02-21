@@ -128,7 +128,7 @@ static PyObject* setErrorThresholds(PyObject* self, PyObject* args)
             return Py_BuildValue("i", -4);  
         }
 
-	deeplearn_set_error_threshold(&learner, index, (float)PyFloat_AsDouble(next));
+        deeplearn_set_error_threshold(&learner, index, (float)PyFloat_AsDouble(next));
         index++;
     }
     
@@ -253,6 +253,7 @@ static PyObject* setInput(PyObject* self, PyObject* args)
     return Py_BuildValue("i", 0);
 }
 
+
 static PyObject* setInputs(PyObject* self, PyObject* args)
 {    
     PyObject *obj;
@@ -296,6 +297,80 @@ static PyObject* setInputs(PyObject* self, PyObject* args)
     }
     
     return Py_BuildValue("i", 0);
+}
+
+static PyObject* test(PyObject* self, PyObject* args)
+{    
+    PyObject *obj;
+    int index = 0;
+    PyObject *pylist, *item;
+    float value, range, normalised;
+
+    if (initialised == 0) {
+        return Py_BuildValue("i", -1);  
+    }
+
+    if (!PyArg_ParseTuple(args, "O", &obj)) {
+        return Py_BuildValue("i", -2);  
+    }
+
+    PyObject *iter = PyObject_GetIter(obj);
+    if (!iter) {
+        return Py_BuildValue("i", -3);  
+    }
+
+    /* read the inputs list */
+    while (1) {     
+        PyObject *next = PyIter_Next(iter);
+        if (!next) {
+            /* nothing left in the iterator */
+            break;
+        }
+
+        if (index >= learner.net->NoOfInputs) {
+            return Py_BuildValue("i", -4);
+        }
+        
+        if (!PyFloat_Check(next)) {
+            /* error, we were expecting a floating point value */
+            return Py_BuildValue("i", -5);  
+        }
+
+        value = (float)PyFloat_AsDouble(next);
+        range = learner.input_range_max[index] - learner.input_range_min[index];
+        if (range > 0.001f) {
+            normalised = (((value - learner.input_range_min[index])/range)*0.5f) + 0.25f;
+            if (normalised < 0.25f) {
+                normalised = 0.25f;
+            }
+            if (normalised > 0.75f) {
+                normalised = 0.75f;
+            }
+            deeplearn_set_input(&learner, index, normalised);
+        }
+        index++;
+    }
+    if (index != learner.net->NoOfInputs) {
+        return Py_BuildValue("i", -6);
+    }
+
+    /* update the network */
+    deeplearn_feed_forward(&learner);
+
+    /* return the outputs as a list */
+    pylist = PyList_New(learner.net->NoOfOutputs);
+    for (index = 0; index < learner.net->NoOfOutputs; index++) {
+        value = deeplearn_get_output(&learner, index);
+        range = learner.output_range_max[index] - learner.output_range_min[index];
+        normalised = -9999;
+        if (range > 0.001f) {
+            normalised = (((value - 0.25f)/0.5f)*range) + learner.output_range_min[index];
+        }
+        item = PyFloat_FromDouble((double)normalised);
+        PyList_SET_ITEM(pylist, index, item);
+    }
+
+    return pylist;
 }
 
 static PyObject* setOutput(PyObject* self, PyObject* args)
@@ -580,7 +655,8 @@ static PyMethodDef DeeplearnMethods[] =
     {"training", training, METH_VARARGS, "Performs a training step"},
     {"getPerformance", getPerformance, METH_VARARGS, "Returns the test set performance as a percentage"},
     {"export", export, METH_VARARGS, "Exports the trained network as a standalone C program"},
-    {"getErrorThreshold", getErrorThreshold, METH_VARARGS, "Returns an error threshold for the given layer"},
+    {"getErrorThreshold", getErrorThreshold, METH_VARARGS, "Returns an error threshold for the given layer"}, 
+    {"test", test, METH_VARARGS, "Supply some inputs and returns the output values"}, 
     {NULL, NULL, 0, NULL}
 };
 
