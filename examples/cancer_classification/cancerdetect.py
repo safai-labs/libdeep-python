@@ -36,3 +36,6 @@ print "Test data set performance is " + str(deeplearn.getPerformance()) + "%";
 
 deeplearn.export("result.c")
 print "Exported trained network"
+
+deeplearn.save("result.nn")
+print "Saved trained network"
