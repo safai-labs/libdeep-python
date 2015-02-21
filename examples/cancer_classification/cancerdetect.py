@@ -5,7 +5,7 @@ import deeplearn
 
 # Reads a number of data samples from a CSV file
 # where the expected output value is the second field (index 1)
-noOfSamples = deeplearn.readCsvFile("wdbc.data", 16, 3, [1])
+noOfSamples = deeplearn.readCsvFile("wdbc.data", 16, 3, [1], 0)
 print str(noOfSamples) + " samples loaded"
 
 # The error threshold (percent) for each layer of the network.

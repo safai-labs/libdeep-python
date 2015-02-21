@@ -422,10 +422,10 @@ static PyObject* readCsvFile(PyObject* self, PyObject* args)
     PyObject *obj;
     int retval;
     char * filename;
-    int no_of_hiddens, hidden_layers, no_of_outputs=0;
+    int no_of_hiddens, hidden_layers, no_of_outputs=0, output_classes=0;
     int output_field_index[256];
 
-    if (!PyArg_ParseTuple(args, "siiO", &filename, &no_of_hiddens, &hidden_layers, &obj))
+    if (!PyArg_ParseTuple(args, "siiOi", &filename, &no_of_hiddens, &hidden_layers, &obj, &output_classes))
         return Py_BuildValue("i", -1);
 
     initialised = 1;
@@ -459,6 +459,7 @@ static PyObject* readCsvFile(PyObject* self, PyObject* args)
                                     no_of_hiddens, hidden_layers,
                                     no_of_outputs,
                                     output_field_index,
+                                    output_classes,
                                     error_threshold,
                                     &random_seed);
     return Py_BuildValue("i", retval);
@@ -484,6 +485,30 @@ static PyObject* getOutput(PyObject* self, PyObject* args)
     }
 
     return Py_BuildValue("f", deeplearn_get_output(&learner, index));
+}
+
+static PyObject* getClass(PyObject* self, PyObject* args)
+{
+    if (initialised == 0) {
+        return Py_BuildValue("i", -1);  
+    }
+
+    return Py_BuildValue("i", deeplearn_get_class(&learner));
+}
+
+static PyObject* setClass(PyObject* self, PyObject* args)
+{
+    int class = 0;
+    if (initialised == 0) {
+        return Py_BuildValue("i", -1);  
+    }
+
+    if (!PyArg_ParseTuple(args, "i", &class)) {
+        return Py_BuildValue("i", -2);  
+    }
+
+    deeplearn_set_class(&learner, class);
+    return Py_BuildValue("i", 0);
 }
 
 static PyObject* setOutputs(PyObject* self, PyObject* args)
@@ -639,6 +664,8 @@ static PyMethodDef DeeplearnMethods[] =
     {"setInputs", setInputs, METH_VARARGS, "Sets the inputs from an array of floats"},
     {"setOutput", setOutput, METH_VARARGS, "Sets the desired value of an output"},
     {"getOutput", getOutput, METH_VARARGS, "Gets an output value"},
+    {"getClass", getClass, METH_VARARGS, "Gets the output class"},
+    {"setClass", setClass, METH_VARARGS, "Sets the output class"},
     {"setOutputs", setOutputs, METH_VARARGS, "Sets the desired outputs from an array of floats"},
     {"save", save, METH_VARARGS, "Save the network"},
     {"load", load, METH_VARARGS, "Load a network"},
