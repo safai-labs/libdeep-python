@@ -590,7 +590,8 @@ static PyObject* load(PyObject* self, PyObject* args)
         retval = deeplearn_load(fp, &learner, &random_seed);
         fclose(fp);
         if (retval == 0) {
-          return Py_BuildValue("i", 0);
+            initialised = 1;
+            return Py_BuildValue("i", 0);
         }
         return Py_BuildValue("i", -100 + retval);
     }
