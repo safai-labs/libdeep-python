@@ -580,15 +580,19 @@ static PyObject* load(PyObject* self, PyObject* args)
 {
     FILE * fp;
     char * filename = NULL;
+    int retval=-1;
     
     if (!PyArg_ParseTuple(args, "s", &filename))
-        return Py_BuildValue("i", -2);
+        return Py_BuildValue("i", -1);
 
     fp = fopen(filename,"r");
     if (fp) {
-        deeplearn_load(fp, &learner, &random_seed);
+        retval = deeplearn_load(fp, &learner, &random_seed);
         fclose(fp);
-        return Py_BuildValue("i", 0);
+        if (retval == 0) {
+          return Py_BuildValue("i", 0);
+        }
+        return Py_BuildValue("i", -100 + retval);
     }
     return Py_BuildValue("i", -2);
 }
