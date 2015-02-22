@@ -1,6 +1,5 @@
 #!/usr/bin/python
 
-import sys
 import deeplearn
 
 # Rather than showing numbers show the species names

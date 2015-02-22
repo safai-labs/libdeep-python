@@ -1,6 +1,5 @@
 #!/usr/bin/python
 
-import sys
 import deeplearn
 
 # The number of iris species to classify

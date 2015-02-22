@@ -1,6 +1,5 @@
 #!/usr/bin/python
 
-import sys
 import deeplearn
 
 # Reads a number of data samples from a CSV file
