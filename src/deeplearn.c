@@ -352,29 +352,29 @@ static PyObject* setFields(PyObject* self, PyObject* args)
 static PyObject* setField(PyObject* self, PyObject* args)
 {
     int fieldindex=0;
-	char * text=0;
+    char * text=0;
 
     if (initialised == 0) {
         return Py_BuildValue("i", -1);
     }
 
-	if (learner.no_of_input_fields == 0) {
+    if (learner.no_of_input_fields == 0) {
         return Py_BuildValue("i", -2);
-	}
+    }
 
-	if (!PyArg_ParseTuple(args, "is", &fieldindex, text))
-		return Py_BuildValue("i", -3);
+    if (!PyArg_ParseTuple(args, "is", &fieldindex, text))
+        return Py_BuildValue("i", -3);
 
-	if (fieldindex >= learner.no_of_input_fields) {
+    if (fieldindex >= learner.no_of_input_fields) {
         return Py_BuildValue("i", -4);
-	}
+    }
 
-	if (learner.field_length[fieldindex] == 0) {
-		deeplearn_set_input_field(&learner, fieldindex, atof(text));
-	}
-	else {
-		deeplearn_set_input_field_text(&learner, fieldindex, text);
-	}
+    if (learner.field_length[fieldindex] == 0) {
+        deeplearn_set_input_field(&learner, fieldindex, atof(text));
+    }
+    else {
+        deeplearn_set_input_field_text(&learner, fieldindex, text);
+    }
 
     return Py_BuildValue("i", 0);
 }
@@ -385,6 +385,7 @@ static PyObject* test(PyObject* self, PyObject* args)
     int index = 0;
     PyObject *pylist, *item;
     float value, range, normalised;
+    char * text=0;
 
     if (initialised == 0) {
         return Py_BuildValue("i", -1);
@@ -400,38 +401,105 @@ static PyObject* test(PyObject* self, PyObject* args)
     }
 
     /* read the inputs list */
-    while (1) {
-        PyObject *next = PyIter_Next(iter);
-        if (!next) {
-            /* nothing left in the iterator */
-            break;
-        }
-
-        if (index >= learner.net->NoOfInputs) {
-            return Py_BuildValue("i", -4);
-        }
-
-        if (!PyFloat_Check(next)) {
-            /* error, we were expecting a floating point value */
-            return Py_BuildValue("i", -5);
-        }
-
-        value = (float)PyFloat_AsDouble(next);
-        range = learner.input_range_max[index] - learner.input_range_min[index];
-        if (range > 0.001f) {
-            normalised = (((value - learner.input_range_min[index])/range)*0.5f) + 0.25f;
-            if (normalised < 0.25f) {
-                normalised = 0.25f;
+    if (learner.no_of_input_fields == 0) {
+        while (1) {
+            PyObject *next = PyIter_Next(iter);
+            if (!next) {
+                /* nothing left in the iterator */
+                break;
             }
-            if (normalised > 0.75f) {
-                normalised = 0.75f;
+
+            if (index >= learner.net->NoOfInputs) {
+                return Py_BuildValue("i", -4);
             }
-            deeplearn_set_input(&learner, index, normalised);
+
+            if (!PyFloat_Check(next)) {
+                /* error, we were expecting a floating point value */
+                return Py_BuildValue("i", -5);
+            }
+
+            value = (float)PyFloat_AsDouble(next);
+            range = learner.input_range_max[index] - learner.input_range_min[index];
+            if (range > 0.001f) {
+                normalised = (((value - learner.input_range_min[index])/range)*0.5f) + 0.25f;
+                if (normalised < 0.25f) {
+                    normalised = 0.25f;
+                }
+                if (normalised > 0.75f) {
+                    normalised = 0.75f;
+                }
+                deeplearn_set_input(&learner, index, normalised);
+            }
+            index++;
         }
-        index++;
+        if (index != learner.net->NoOfInputs) {
+            return Py_BuildValue("i", -6);
+        }
     }
-    if (index != learner.net->NoOfInputs) {
-        return Py_BuildValue("i", -6);
+    else {
+
+        if (learner.field_length == 0) {
+            return Py_BuildValue("i", -7);
+        }
+
+        while (1) {
+            PyObject *next = PyIter_Next(iter);
+            if (!next) {
+                /* nothing left in the iterator */
+                break;
+            }
+
+            if (index >= learner.no_of_input_fields) {
+                return Py_BuildValue("i", -8);
+            }
+
+            if (learner.field_length[index] == 0) {
+                if (!PyFloat_Check(next)) {
+                    /* error, we were expecting a floating point value */
+                    return Py_BuildValue("i", -9);
+                }
+                value = (float)PyFloat_AsDouble(next);
+                range = learner.input_range_max[index] - learner.input_range_min[index];
+                if (range > 0.001f) {
+                    normalised = (((value - learner.input_range_min[index])/range)*0.5f) + 0.25f;
+                    if (normalised < 0.25f) {
+                        normalised = 0.25f;
+                    }
+                    if (normalised > 0.75f) {
+                        normalised = 0.75f;
+                    }
+                    deeplearn_set_input_field(&learner, index, normalised);
+                }
+            }
+            else {
+                if (!PyString_Check(next)) {
+                    /* error, we were expecting a string value */
+                    return Py_BuildValue("i", -10);
+                }
+                text = PyString_AsString(next);
+                deeplearn_set_input_field_text(&learner, index, text);
+            }
+
+            index++;
+        }
+        if (index != learner.no_of_input_fields) {
+            return Py_BuildValue("i", -11);
+        }
+		/*
+		printf("\n");
+		for (index = 0; index < learner.net->NoOfInputs; index++) {
+			if (learner.net->inputs[index]->value > 0.6f) {
+				printf("1");
+			}
+			if (learner.net->inputs[index]->value < 0.4f) {
+				printf("0");
+			}
+			if ((learner.net->inputs[index]->value > 0.4f) &&
+				(learner.net->inputs[index]->value < 0.6f)) {
+				printf("-");
+			}
+		}
+		printf("\n"); */
     }
 
     /* update the network */
