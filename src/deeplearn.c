@@ -253,7 +253,6 @@ static PyObject* setInput(PyObject* self, PyObject* args)
     return Py_BuildValue("i", 0);
 }
 
-
 static PyObject* setInputs(PyObject* self, PyObject* args)
 {
     PyObject *obj;
@@ -346,6 +345,36 @@ static PyObject* setFields(PyObject* self, PyObject* args)
     if (index != learner.no_of_input_fields) {
         return Py_BuildValue("i", -6);
     }
+
+    return Py_BuildValue("i", 0);
+}
+
+static PyObject* setField(PyObject* self, PyObject* args)
+{
+    int fieldindex=0;
+	char * text=0;
+
+    if (initialised == 0) {
+        return Py_BuildValue("i", -1);
+    }
+
+	if (learner.no_of_input_fields == 0) {
+        return Py_BuildValue("i", -2);
+	}
+
+	if (!PyArg_ParseTuple(args, "is", &fieldindex, text))
+		return Py_BuildValue("i", -3);
+
+	if (fieldindex >= learner.no_of_input_fields) {
+        return Py_BuildValue("i", -4);
+	}
+
+	if (learner.field_length[fieldindex] == 0) {
+		deeplearn_set_input_field(&learner, fieldindex, atof(text));
+	}
+	else {
+		deeplearn_set_input_field_text(&learner, fieldindex, text);
+	}
 
     return Py_BuildValue("i", 0);
 }
@@ -717,6 +746,7 @@ static PyMethodDef DeeplearnMethods[] =
     {"feedForward", feedForward, METH_VARARGS, "Perform network feed forward"},
     {"update", update, METH_VARARGS, "Update the network"},
     {"setInput", setInput, METH_VARARGS, "Sets the value of an input"},
+    {"setField", setField, METH_VARARGS, "Sets the value of an input field, which can be either a number of a string"},
     {"setInputs", setInputs, METH_VARARGS, "Sets the inputs from an array of floats"},
     {"setFields", setFields, METH_VARARGS, "Sets the input fields from an array which can contain numbers and strings"},
     {"setOutput", setOutput, METH_VARARGS, "Sets the desired value of an output"},
