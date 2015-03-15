@@ -99,20 +99,20 @@ static PyObject* layers(PyObject* self, PyObject* args)
 }
 
 static PyObject* setErrorThresholds(PyObject* self, PyObject* args)
-{    
+{
     PyObject *obj;
     int index = 0;
 
     if (!PyArg_ParseTuple(args, "O", &obj)) {
-        return Py_BuildValue("i", -1);  
+        return Py_BuildValue("i", -1);
     }
 
     PyObject *iter = PyObject_GetIter(obj);
     if (!iter) {
-        return Py_BuildValue("i", -2);  
+        return Py_BuildValue("i", -2);
     }
 
-    while (1) {     
+    while (1) {
         PyObject *next = PyIter_Next(iter);
         if (!next) {
             /* nothing left in the iterator */
@@ -122,16 +122,16 @@ static PyObject* setErrorThresholds(PyObject* self, PyObject* args)
         if (index >= 20) {
             return Py_BuildValue("i", -3);
         }
-        
+
         if (!PyFloat_Check(next)) {
             /* error, we were expecting a floating point value */
-            return Py_BuildValue("i", -4);  
+            return Py_BuildValue("i", -4);
         }
 
         deeplearn_set_error_threshold(&learner, index, (float)PyFloat_AsDouble(next));
         index++;
     }
-    
+
     return Py_BuildValue("i", 0);
 }
 
@@ -199,7 +199,7 @@ static PyObject* init(PyObject* self, PyObject* args)
         deeplearn_free(&learner);
         initialised = 0;
     }
-    
+
     if (!PyArg_ParseTuple(args, "iiii",
                           &no_of_inputs,
                           &no_of_hiddens,
@@ -222,7 +222,7 @@ static PyObject* init(PyObject* self, PyObject* args)
 static PyObject* feedForward(PyObject* self, PyObject* args)
 {
     if (initialised == 0) {
-        return Py_BuildValue("i", -1);  
+        return Py_BuildValue("i", -1);
     }
     deeplearn_feed_forward(&learner);
     return Py_BuildValue("i", 0);
@@ -231,7 +231,7 @@ static PyObject* feedForward(PyObject* self, PyObject* args)
 static PyObject* update(PyObject* self, PyObject* args)
 {
     if (initialised == 0) {
-        return Py_BuildValue("i", -1);  
+        return Py_BuildValue("i", -1);
     }
     deeplearn_update(&learner);
     return Py_BuildValue("i", 0);
@@ -241,9 +241,9 @@ static PyObject* setInput(PyObject* self, PyObject* args)
 {
     int index=0;
     float value=0;
-    
+
     if (initialised == 0) {
-        return Py_BuildValue("i", -1);  
+        return Py_BuildValue("i", -1);
     }
 
     if (!PyArg_ParseTuple(args, "if", &index, &value))
@@ -255,24 +255,24 @@ static PyObject* setInput(PyObject* self, PyObject* args)
 
 
 static PyObject* setInputs(PyObject* self, PyObject* args)
-{    
+{
     PyObject *obj;
     int index = 0;
 
     if (initialised == 0) {
-        return Py_BuildValue("i", -1);  
+        return Py_BuildValue("i", -1);
     }
 
     if (!PyArg_ParseTuple(args, "O", &obj)) {
-        return Py_BuildValue("i", -2);  
+        return Py_BuildValue("i", -2);
     }
 
     PyObject *iter = PyObject_GetIter(obj);
     if (!iter) {
-        return Py_BuildValue("i", -3);  
+        return Py_BuildValue("i", -3);
     }
 
-    while (1) {     
+    while (1) {
         PyObject *next = PyIter_Next(iter);
         if (!next) {
             /* nothing left in the iterator */
@@ -282,10 +282,10 @@ static PyObject* setInputs(PyObject* self, PyObject* args)
         if (index >= learner.net->NoOfInputs) {
             return Py_BuildValue("i", -4);
         }
-        
+
         if (!PyFloat_Check(next)) {
             /* error, we were expecting a floating point value */
-            return Py_BuildValue("i", -5);  
+            return Py_BuildValue("i", -5);
         }
 
         double value = PyFloat_AsDouble(next);
@@ -295,32 +295,83 @@ static PyObject* setInputs(PyObject* self, PyObject* args)
     if (index != learner.net->NoOfInputs) {
         return Py_BuildValue("i", -6);
     }
-    
+
+    return Py_BuildValue("i", 0);
+}
+
+static PyObject* setFields(PyObject* self, PyObject* args)
+{
+    PyObject *obj;
+    int index = 0;
+
+    if (initialised == 0) {
+        return Py_BuildValue("i", -1);
+    }
+
+    if (!PyArg_ParseTuple(args, "O", &obj)) {
+        return Py_BuildValue("i", -2);
+    }
+
+    PyObject *iter = PyObject_GetIter(obj);
+    if (!iter) {
+        return Py_BuildValue("i", -3);
+    }
+
+    while (1) {
+        PyObject *next = PyIter_Next(iter);
+        if (!next) {
+            /* nothing left in the iterator */
+            break;
+        }
+
+        if (index >= learner.no_of_input_fields) {
+            return Py_BuildValue("i", -4);
+        }
+
+        if (learner.field_length[index] == 0) {
+            if (!PyFloat_Check(next)) {
+                /* error, we were expecting a floating point value */
+                return Py_BuildValue("i", -5);
+            }
+            double value = PyFloat_AsDouble(next);
+            deeplearn_set_input_field(&learner, index, (float)value);
+        }
+        else {
+            char * text = PyString_AsString(next);
+            deeplearn_set_input_field_text(&learner, index, text);
+        }
+
+        index++;
+    }
+    if (index != learner.no_of_input_fields) {
+        return Py_BuildValue("i", -6);
+    }
+
     return Py_BuildValue("i", 0);
 }
 
 static PyObject* test(PyObject* self, PyObject* args)
-{    
+{
     PyObject *obj;
     int index = 0;
     PyObject *pylist, *item;
     float value, range, normalised;
 
     if (initialised == 0) {
-        return Py_BuildValue("i", -1);  
+        return Py_BuildValue("i", -1);
     }
 
     if (!PyArg_ParseTuple(args, "O", &obj)) {
-        return Py_BuildValue("i", -2);  
+        return Py_BuildValue("i", -2);
     }
 
     PyObject *iter = PyObject_GetIter(obj);
     if (!iter) {
-        return Py_BuildValue("i", -3);  
+        return Py_BuildValue("i", -3);
     }
 
     /* read the inputs list */
-    while (1) {     
+    while (1) {
         PyObject *next = PyIter_Next(iter);
         if (!next) {
             /* nothing left in the iterator */
@@ -330,10 +381,10 @@ static PyObject* test(PyObject* self, PyObject* args)
         if (index >= learner.net->NoOfInputs) {
             return Py_BuildValue("i", -4);
         }
-        
+
         if (!PyFloat_Check(next)) {
             /* error, we were expecting a floating point value */
-            return Py_BuildValue("i", -5);  
+            return Py_BuildValue("i", -5);
         }
 
         value = (float)PyFloat_AsDouble(next);
@@ -377,9 +428,9 @@ static PyObject* setOutput(PyObject* self, PyObject* args)
 {
     int index=0;
     float value=0;
-    
+
     if (initialised == 0) {
-        return Py_BuildValue("i", -1);  
+        return Py_BuildValue("i", -1);
     }
 
     if (!PyArg_ParseTuple(args, "if", &index, &value))
@@ -392,9 +443,9 @@ static PyObject* setOutput(PyObject* self, PyObject* args)
 static PyObject* setHistoryPlotInterval(PyObject* self, PyObject* args)
 {
     int interval=0;
-    
+
     if (initialised == 0) {
-        return Py_BuildValue("i", -1);  
+        return Py_BuildValue("i", -1);
     }
     if (!PyArg_ParseTuple(args, "i", &interval))
         return Py_BuildValue("i", -2);
@@ -406,9 +457,9 @@ static PyObject* setHistoryPlotInterval(PyObject* self, PyObject* args)
 static PyObject* setPlotTitle(PyObject* self, PyObject* args)
 {
     char * title;
-    
+
     if (initialised == 0) {
-        return Py_BuildValue("i", -1);  
+        return Py_BuildValue("i", -1);
     }
     if (!PyArg_ParseTuple(args, "s", &title))
         return Py_BuildValue("i", -2);
@@ -429,32 +480,32 @@ static PyObject* readCsvFile(PyObject* self, PyObject* args)
         return Py_BuildValue("i", -1);
 
     initialised = 1;
-    
+
     /* get the field indexes of outputs */
     PyObject *iter = PyObject_GetIter(obj);
     if (!iter) {
-        return Py_BuildValue("i", -2);  
+        return Py_BuildValue("i", -2);
     }
 
-    while (1) {     
+    while (1) {
         PyObject *next = PyIter_Next(iter);
         if (!next) {
             /* nothing left in the iterator */
             break;
         }
-        
+
         if (!PyInt_Check(next)) {
             /* error, we were expecting an integer value */
-            return Py_BuildValue("i", -4);  
+            return Py_BuildValue("i", -4);
         }
 
         output_field_index[no_of_outputs++] = (int)PyInt_AsLong(next);
     }
 
     if (no_of_outputs == 0) {
-        return Py_BuildValue("i", -5);  
+        return Py_BuildValue("i", -5);
     }
-        
+
     retval = deeplearndata_read_csv(filename, &learner,
                                     no_of_hiddens, hidden_layers,
                                     no_of_outputs,
@@ -468,9 +519,9 @@ static PyObject* readCsvFile(PyObject* self, PyObject* args)
 static PyObject* getOutput(PyObject* self, PyObject* args)
 {
     int index=0;
-    
+
     if (initialised == 0) {
-        return Py_BuildValue("i", -1);  
+        return Py_BuildValue("i", -1);
     }
 
     if (!PyArg_ParseTuple(args, "i", &index))
@@ -490,7 +541,7 @@ static PyObject* getOutput(PyObject* self, PyObject* args)
 static PyObject* getClass(PyObject* self, PyObject* args)
 {
     if (initialised == 0) {
-        return Py_BuildValue("i", -1);  
+        return Py_BuildValue("i", -1);
     }
 
     return Py_BuildValue("i", deeplearn_get_class(&learner));
@@ -500,11 +551,11 @@ static PyObject* setClass(PyObject* self, PyObject* args)
 {
     int class = 0;
     if (initialised == 0) {
-        return Py_BuildValue("i", -1);  
+        return Py_BuildValue("i", -1);
     }
 
     if (!PyArg_ParseTuple(args, "i", &class)) {
-        return Py_BuildValue("i", -2);  
+        return Py_BuildValue("i", -2);
     }
 
     deeplearn_set_class(&learner, class);
@@ -512,24 +563,24 @@ static PyObject* setClass(PyObject* self, PyObject* args)
 }
 
 static PyObject* setOutputs(PyObject* self, PyObject* args)
-{    
+{
     PyObject *obj;
     int index = 0;
 
     if (initialised == 0) {
-        return Py_BuildValue("i", -1);  
+        return Py_BuildValue("i", -1);
     }
 
     if (!PyArg_ParseTuple(args, "O", &obj)) {
-        return Py_BuildValue("i", -2);  
+        return Py_BuildValue("i", -2);
     }
 
     PyObject *iter = PyObject_GetIter(obj);
     if (!iter) {
-        return Py_BuildValue("i", -3);  
+        return Py_BuildValue("i", -3);
     }
 
-    while (1) {     
+    while (1) {
         PyObject *next = PyIter_Next(iter);
         if (!next) {
             /* nothing left in the iterator */
@@ -539,10 +590,10 @@ static PyObject* setOutputs(PyObject* self, PyObject* args)
         if (index >= learner.net->NoOfOutputs) {
             return Py_BuildValue("i", -4);
         }
-        
+
         if (!PyFloat_Check(next)) {
             /* error, we were expecting a floating point value */
-            return Py_BuildValue("i", -5);  
+            return Py_BuildValue("i", -5);
         }
 
         double value = PyFloat_AsDouble(next);
@@ -552,7 +603,7 @@ static PyObject* setOutputs(PyObject* self, PyObject* args)
     if (index != learner.net->NoOfOutputs) {
         return Py_BuildValue("i", -6);
     }
-    
+
     return Py_BuildValue("i", 0);
 }
 
@@ -560,9 +611,9 @@ static PyObject* save(PyObject* self, PyObject* args)
 {
     FILE * fp;
     char * filename;
-    
+
     if (initialised == 0) {
-        return Py_BuildValue("i", -1);  
+        return Py_BuildValue("i", -1);
     }
     if (!PyArg_ParseTuple(args, "s", &filename))
         return Py_BuildValue("i", -2);
@@ -581,7 +632,7 @@ static PyObject* load(PyObject* self, PyObject* args)
     FILE * fp;
     char * filename = NULL;
     int retval=-1;
-    
+
     if (!PyArg_ParseTuple(args, "s", &filename))
         return Py_BuildValue("i", -1);
 
@@ -606,7 +657,7 @@ static PyObject* plotHistory(PyObject* self, PyObject* args)
     int image_width=640, image_height=200;
 
     if (initialised == 0) {
-        return Py_BuildValue("i", -1);  
+        return Py_BuildValue("i", -1);
     }
 
     if (!PyArg_ParseTuple(args, "ssii", &filename, &title, &image_width, &image_height))
@@ -624,7 +675,7 @@ static PyObject* plotHistory(PyObject* self, PyObject* args)
 static PyObject* training(PyObject* self, PyObject* args)
 {
     if (initialised == 0) {
-        return Py_BuildValue("i", -1);  
+        return Py_BuildValue("i", -1);
     }
 
     return Py_BuildValue("i", deeplearndata_training(&learner));
@@ -634,7 +685,7 @@ static PyObject* training(PyObject* self, PyObject* args)
 static PyObject* getPerformance(PyObject* self, PyObject* args)
 {
     if (initialised == 0) {
-        return Py_BuildValue("i", -1);  
+        return Py_BuildValue("i", -1);
     }
 
     return Py_BuildValue("f", deeplearndata_get_performance(&learner));
@@ -645,7 +696,7 @@ static PyObject* export(PyObject* self, PyObject* args)
     char * filename;
 
     if (initialised == 0) {
-        return Py_BuildValue("i", -1);  
+        return Py_BuildValue("i", -1);
     }
 
     if (!PyArg_ParseTuple(args, "s", &filename))
@@ -667,6 +718,7 @@ static PyMethodDef DeeplearnMethods[] =
     {"update", update, METH_VARARGS, "Update the network"},
     {"setInput", setInput, METH_VARARGS, "Sets the value of an input"},
     {"setInputs", setInputs, METH_VARARGS, "Sets the inputs from an array of floats"},
+    {"setFields", setFields, METH_VARARGS, "Sets the input fields from an array which can contain numbers and strings"},
     {"setOutput", setOutput, METH_VARARGS, "Sets the desired value of an output"},
     {"getOutput", getOutput, METH_VARARGS, "Gets an output value"},
     {"getClass", getClass, METH_VARARGS, "Gets the output class"},
@@ -687,8 +739,8 @@ static PyMethodDef DeeplearnMethods[] =
     {"training", training, METH_VARARGS, "Performs a training step"},
     {"getPerformance", getPerformance, METH_VARARGS, "Returns the test set performance as a percentage"},
     {"export", export, METH_VARARGS, "Exports the trained network as a standalone C program"},
-    {"getErrorThreshold", getErrorThreshold, METH_VARARGS, "Returns an error threshold for the given layer"}, 
-    {"test", test, METH_VARARGS, "Supply some inputs and returns the output values"}, 
+    {"getErrorThreshold", getErrorThreshold, METH_VARARGS, "Returns an error threshold for the given layer"},
+    {"test", test, METH_VARARGS, "Supply some inputs and returns the output values"},
     {NULL, NULL, 0, NULL}
 };
 
