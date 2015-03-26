@@ -34,7 +34,7 @@ while (deeplearn.training() != 0):
 print "Training Completed"
 print "Test data set performance is " + str(deeplearn.getPerformance()) + "%";
 
-deeplearn.export("result.c")
+deeplearn.export("result.py")
 print "Exported trained network"
 
 deeplearn.save("result.nn")
