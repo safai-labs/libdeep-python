@@ -485,21 +485,21 @@ static PyObject* test(PyObject* self, PyObject* args)
         if (index != learner.no_of_input_fields) {
             return Py_BuildValue("i", -11);
         }
-		/*
-		printf("\n");
-		for (index = 0; index < learner.net->NoOfInputs; index++) {
-			if (learner.net->inputs[index]->value > 0.6f) {
-				printf("1");
-			}
-			if (learner.net->inputs[index]->value < 0.4f) {
-				printf("0");
-			}
-			if ((learner.net->inputs[index]->value > 0.4f) &&
-				(learner.net->inputs[index]->value < 0.6f)) {
-				printf("-");
-			}
-		}
-		printf("\n"); */
+        /*
+        printf("\n");
+        for (index = 0; index < learner.net->NoOfInputs; index++) {
+            if (learner.net->inputs[index]->value > 0.6f) {
+                printf("1");
+            }
+            if (learner.net->inputs[index]->value < 0.4f) {
+                printf("0");
+            }
+            if ((learner.net->inputs[index]->value > 0.4f) &&
+                (learner.net->inputs[index]->value < 0.6f)) {
+                printf("-");
+            }
+        }
+        printf("\n"); */
     }
 
     /* update the network */
@@ -802,6 +802,18 @@ static PyObject* export(PyObject* self, PyObject* args)
     return Py_BuildValue("f", deeplearn_export(&learner, filename));
 }
 
+static PyObject* deallocate(PyObject* self, PyObject* args)
+{
+    if (initialised == 0) {
+        return Py_BuildValue("i", -1);
+    }
+
+    deeplearn_free(&learner);
+    initialised = 0;
+
+    return Py_BuildValue("i", 0);
+}
+
 /*  define functions in module */
 static PyMethodDef DeeplearnMethods[] =
 {
@@ -838,6 +850,7 @@ static PyMethodDef DeeplearnMethods[] =
     {"getPerformance", getPerformance, METH_VARARGS, "Returns the test set performance as a percentage"},
     {"export", export, METH_VARARGS, "Exports the trained network as a standalone C program"},
     {"getErrorThreshold", getErrorThreshold, METH_VARARGS, "Returns an error threshold for the given layer"},
+    {"free", deallocate, METH_VARARGS, "Deallocate memory"},
     {"test", test, METH_VARARGS, "Supply some inputs and returns the output values"},
     {NULL, NULL, 0, NULL}
 };

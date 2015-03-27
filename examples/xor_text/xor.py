@@ -40,3 +40,6 @@ print "Exported trained network"
 
 deeplearn.save("result.nn")
 print "Saved trained network"
+
+deeplearn.free();
+print "Done"
