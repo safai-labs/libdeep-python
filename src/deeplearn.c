@@ -1,6 +1,6 @@
 /*
  libdeep-python - Python interface for libdeep
- Copyright (C) 2015  Bob Mottram <bob@robotics.uk.to>
+ Copyright (C) 2015-2016  Bob Mottram <bob@robotics.uk.to>
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions
  are met:

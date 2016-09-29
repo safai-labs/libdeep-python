@@ -4,25 +4,35 @@ libdeep-python adds a Python API to the libdeep deep learning library, which is 
 Installation
 ------------
 
-First install libdeep:
+To install dependencies on a Debian based system:
 
-````
-sudo apt-get install build-essential gnuplot doxygen
+``` bash
+sudo apt-get install build-essential gnuplot doxygen python-dev
+```
+
+Or on an Arch based system:
+
+``` bash
+sudo pacman -S gcc gnuplot doxygen
+```
+
+Then install libdeep:
+
+``` bash
 git clone https://github.com/bashrc/libdeep
 cd libdeep
 make
 sudo make install
-````
+```
 
-Now install the python interface:
+Finally install the python interface:
 
-````
-sudo apt-get install python-dev
+``` bash
 git clone https://github.com/bashrc/libdeep-python
 cd libdeep-python
 make
 sudo make install
-````
+```
 
 Usage
 -----
@@ -30,3 +40,13 @@ Usage
 For example use cases see the examples directory and also the manpage.
 
     man libdeep-python
+
+Try an Example
+--------------
+
+To check that the system is working you can try the simplest example, which is learning the XOR function.
+
+``` bash
+cd examples/xor
+./xor.py
+```
