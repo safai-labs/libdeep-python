@@ -44,9 +44,9 @@ static float error_threshold[256];
 static PyObject* getErrorThreshold(PyObject* self, PyObject* args)
 {
     int index=0;
-    if (initialised == 0) {
+    if (initialised == 0)
         return Py_BuildValue("i", -1);
-    }
+
     if (!PyArg_ParseTuple(args, "i", &index))
         return Py_BuildValue("i", -2);
     return Py_BuildValue("f", deeplearn_get_error_threshold(&learner,index));
@@ -54,49 +54,49 @@ static PyObject* getErrorThreshold(PyObject* self, PyObject* args)
 
 static PyObject* currentLayer(PyObject* self, PyObject* args)
 {
-    if (initialised == 0) {
+    if (initialised == 0)
         return Py_BuildValue("i", -1);
-    }
+
     return Py_BuildValue("i", learner.current_hidden_layer);
 }
 
 static PyObject* backpropError(PyObject* self, PyObject* args)
 {
-    if (initialised == 0) {
+    if (initialised == 0)
         return Py_BuildValue("i", -1);
-    }
+
     return Py_BuildValue("f", learner.BPerror);
 }
 
 static PyObject* inputs(PyObject* self, PyObject* args)
 {
-    if (initialised == 0) {
+    if (initialised == 0)
         return Py_BuildValue("i", -1);
-    }
+
     return Py_BuildValue("i", learner.net->NoOfInputs);
 }
 
 static PyObject* outputs(PyObject* self, PyObject* args)
 {
-    if (initialised == 0) {
+    if (initialised == 0)
         return Py_BuildValue("i", -1);
-    }
+
     return Py_BuildValue("i", learner.net->NoOfOutputs);
 }
 
 static PyObject* hiddens(PyObject* self, PyObject* args)
 {
-    if (initialised == 0) {
+    if (initialised == 0)
         return Py_BuildValue("i", -1);
-    }
+
     return Py_BuildValue("i", learner.net->NoOfHiddens);
 }
 
 static PyObject* layers(PyObject* self, PyObject* args)
 {
-    if (initialised == 0) {
+    if (initialised == 0)
         return Py_BuildValue("i", -1);
-    }
+
     return Py_BuildValue("i", learner.net->HiddenLayers);
 }
 
@@ -105,30 +105,26 @@ static PyObject* setErrorThresholds(PyObject* self, PyObject* args)
     PyObject *obj;
     int index = 0;
 
-    if (!PyArg_ParseTuple(args, "O", &obj)) {
+    if (!PyArg_ParseTuple(args, "O", &obj))
         return Py_BuildValue("i", -1);
-    }
 
     PyObject *iter = PyObject_GetIter(obj);
-    if (!iter) {
+    if (!iter)
         return Py_BuildValue("i", -2);
-    }
 
     while (1) {
         PyObject *next = PyIter_Next(iter);
-        if (!next) {
-            /* nothing left in the iterator */
+
+        /* nothing left in the iterator */
+        if (!next)
             break;
-        }
 
-        if (index >= 20) {
+        if (index >= 20)
             return Py_BuildValue("i", -3);
-        }
 
-        if (!PyFloat_Check(next)) {
-            /* error, we were expecting a floating point value */
+        /* error, we were expecting a floating point value */
+        if (!PyFloat_Check(next))
             return Py_BuildValue("i", -4);
-        }
 
         deeplearn_set_error_threshold(&learner, index, (float)PyFloat_AsDouble(next));
         index++;
@@ -143,12 +139,14 @@ static PyObject* setErrorThreshold(PyObject* self, PyObject* args)
     int layer_index=0;
     float threshold=0.1f;
 
-    if (initialised == 0) {
+    if (initialised == 0)
         return Py_BuildValue("i", -1);
-    }
+
     if (!PyArg_ParseTuple(args, "if", &layer_index, &threshold))
         return Py_BuildValue("i", -2);
+
     deeplearn_set_error_threshold(&learner, layer_index, threshold);
+
     return Py_BuildValue("i", 0);
 }
 
@@ -156,12 +154,14 @@ static PyObject* setLearningRate(PyObject* self, PyObject* args)
 {
     float rate=0.1f;
 
-    if (initialised == 0) {
+    if (initialised == 0)
         return Py_BuildValue("i", -1);
-    }
+
     if (!PyArg_ParseTuple(args, "f", &rate))
         return Py_BuildValue("i", -2);
+
     deeplearn_set_learning_rate(&learner, rate);
+
     return Py_BuildValue("i", 0);
 }
 
@@ -169,12 +169,14 @@ static PyObject* setDropoutsPercent(PyObject* self, PyObject* args)
 {
     float percent=2.0f;
 
-    if (initialised == 0) {
+    if (initialised == 0)
         return Py_BuildValue("i", -1);
-    }
+
     if (!PyArg_ParseTuple(args, "f", &percent))
         return Py_BuildValue("i", -2);
+
     deeplearn_set_dropouts(&learner, percent);
+
     return Py_BuildValue("i", 0);
 }
 
@@ -186,7 +188,9 @@ static PyObject* setSeed(PyObject* self, PyObject* args)
     if (!PyArg_ParseTuple(args, "i", \
                           &randseed))
         return NULL;
+
     random_seed = (unsigned int)randseed;
+
     return Py_BuildValue("i", 0);
 }
 
@@ -223,18 +227,18 @@ static PyObject* init(PyObject* self, PyObject* args)
 
 static PyObject* feedForward(PyObject* self, PyObject* args)
 {
-    if (initialised == 0) {
+    if (initialised == 0)
         return Py_BuildValue("i", -1);
-    }
+
     deeplearn_feed_forward(&learner);
     return Py_BuildValue("i", 0);
 }
 
 static PyObject* update(PyObject* self, PyObject* args)
 {
-    if (initialised == 0) {
+    if (initialised == 0)
         return Py_BuildValue("i", -1);
-    }
+
     deeplearn_update(&learner);
     return Py_BuildValue("i", 0);
 }
@@ -244,14 +248,14 @@ static PyObject* setInput(PyObject* self, PyObject* args)
     int index=0;
     float value=0;
 
-    if (initialised == 0) {
+    if (initialised == 0)
         return Py_BuildValue("i", -1);
-    }
 
     if (!PyArg_ParseTuple(args, "if", &index, &value))
         return Py_BuildValue("i", -2);
 
     deeplearn_set_input(&learner, index, value);
+
     return Py_BuildValue("i", 0);
 }
 
@@ -260,42 +264,36 @@ static PyObject* setInputs(PyObject* self, PyObject* args)
     PyObject *obj;
     int index = 0;
 
-    if (initialised == 0) {
+    if (initialised == 0)
         return Py_BuildValue("i", -1);
-    }
 
-    if (!PyArg_ParseTuple(args, "O", &obj)) {
+    if (!PyArg_ParseTuple(args, "O", &obj))
         return Py_BuildValue("i", -2);
-    }
 
     PyObject *iter = PyObject_GetIter(obj);
-    if (!iter) {
+    if (!iter)
         return Py_BuildValue("i", -3);
-    }
 
     while (1) {
         PyObject *next = PyIter_Next(iter);
-        if (!next) {
-            /* nothing left in the iterator */
+        /* nothing left in the iterator */
+        if (!next)
             break;
-        }
 
-        if (index >= learner.net->NoOfInputs) {
+        if (index >= learner.net->NoOfInputs)
             return Py_BuildValue("i", -4);
-        }
 
-        if (!PyFloat_Check(next)) {
-            /* error, we were expecting a floating point value */
+        /* error, we were expecting a floating point value */
+        if (!PyFloat_Check(next))
             return Py_BuildValue("i", -5);
-        }
 
         double value = PyFloat_AsDouble(next);
         deeplearn_set_input(&learner, index, (float)value);
         index++;
     }
-    if (index != learner.net->NoOfInputs) {
+
+    if (index != learner.net->NoOfInputs)
         return Py_BuildValue("i", -6);
-    }
 
     return Py_BuildValue("i", 0);
 }
@@ -305,35 +303,31 @@ static PyObject* setFields(PyObject* self, PyObject* args)
     PyObject *obj;
     int index = 0;
 
-    if (initialised == 0) {
+    if (initialised == 0)
         return Py_BuildValue("i", -1);
-    }
 
-    if (!PyArg_ParseTuple(args, "O", &obj)) {
+    if (!PyArg_ParseTuple(args, "O", &obj))
         return Py_BuildValue("i", -2);
-    }
 
     PyObject *iter = PyObject_GetIter(obj);
-    if (!iter) {
+    if (!iter)
         return Py_BuildValue("i", -3);
-    }
 
     while (1) {
         PyObject *next = PyIter_Next(iter);
-        if (!next) {
-            /* nothing left in the iterator */
-            break;
-        }
 
-        if (index >= learner.no_of_input_fields) {
+        /* nothing left in the iterator */
+        if (!next)
+            break;
+
+        if (index >= learner.no_of_input_fields)
             return Py_BuildValue("i", -4);
-        }
 
         if (learner.field_length[index] == 0) {
-            if (!PyFloat_Check(next)) {
-                /* error, we were expecting a floating point value */
+            /* error, we were expecting a floating point value */
+            if (!PyFloat_Check(next))
                 return Py_BuildValue("i", -5);
-            }
+
             double value = PyFloat_AsDouble(next);
             deeplearn_set_input_field(&learner, index, (float)value);
         }
@@ -348,9 +342,9 @@ static PyObject* setFields(PyObject* self, PyObject* args)
 
         index++;
     }
-    if (index != learner.no_of_input_fields) {
+
+    if (index != learner.no_of_input_fields)
         return Py_BuildValue("i", -6);
-    }
 
     return Py_BuildValue("i", 0);
 }
@@ -360,27 +354,22 @@ static PyObject* setField(PyObject* self, PyObject* args)
     int fieldindex=0;
     char * text=0;
 
-    if (initialised == 0) {
+    if (initialised == 0)
         return Py_BuildValue("i", -1);
-    }
 
-    if (learner.no_of_input_fields == 0) {
+    if (learner.no_of_input_fields == 0)
         return Py_BuildValue("i", -2);
-    }
 
     if (!PyArg_ParseTuple(args, "is", &fieldindex, text))
         return Py_BuildValue("i", -3);
 
-    if (fieldindex >= learner.no_of_input_fields) {
+    if (fieldindex >= learner.no_of_input_fields)
         return Py_BuildValue("i", -4);
-    }
 
-    if (learner.field_length[fieldindex] == 0) {
+    if (learner.field_length[fieldindex] == 0)
         deeplearn_set_input_field(&learner, fieldindex, atof(text));
-    }
-    else {
+    else
         deeplearn_set_input_field_text(&learner, fieldindex, text);
-    }
 
     return Py_BuildValue("i", 0);
 }
@@ -393,102 +382,95 @@ static PyObject* test(PyObject* self, PyObject* args)
     float value, range, normalised;
     char * text=0;
 
-    if (initialised == 0) {
+    if (initialised == 0)
         return Py_BuildValue("i", -1);
-    }
 
-    if (!PyArg_ParseTuple(args, "O", &obj)) {
+    if (!PyArg_ParseTuple(args, "O", &obj))
         return Py_BuildValue("i", -2);
-    }
 
     PyObject *iter = PyObject_GetIter(obj);
-    if (!iter) {
+    if (!iter)
         return Py_BuildValue("i", -3);
-    }
 
     /* read the inputs list */
     if (learner.no_of_input_fields == 0) {
         while (1) {
             PyObject *next = PyIter_Next(iter);
-            if (!next) {
-                /* nothing left in the iterator */
+
+            /* nothing left in the iterator */
+            if (!next)
                 break;
-            }
 
-            if (index >= learner.net->NoOfInputs) {
+            if (index >= learner.net->NoOfInputs)
                 return Py_BuildValue("i", -4);
-            }
 
-            if (!PyFloat_Check(next)) {
-                /* error, we were expecting a floating point value */
+            /* error, we were expecting a floating point value */
+            if (!PyFloat_Check(next))
                 return Py_BuildValue("i", -5);
-            }
 
             value = (float)PyFloat_AsDouble(next);
             range = learner.input_range_max[index] - learner.input_range_min[index];
             if (range > 0.001f) {
                 normalised = (((value - learner.input_range_min[index])/range)*0.5f) + 0.25f;
-                if (normalised < 0.25f) {
+                if (normalised < 0.25f)
                     normalised = 0.25f;
-                }
-                if (normalised > 0.75f) {
+
+                if (normalised > 0.75f)
                     normalised = 0.75f;
-                }
+
                 deeplearn_set_input(&learner, index, normalised);
             }
             index++;
         }
-        if (index != learner.net->NoOfInputs) {
+
+        if (index != learner.net->NoOfInputs)
             return Py_BuildValue("i", -6);
-        }
     }
     else {
 
-        if (learner.field_length == 0) {
+        if (learner.field_length == 0)
             return Py_BuildValue("i", -7);
-        }
 
         while (1) {
             PyObject *next = PyIter_Next(iter);
-            if (!next) {
-                /* nothing left in the iterator */
-                break;
-            }
 
-            if (index >= learner.no_of_input_fields) {
+            /* nothing left in the iterator */
+            if (!next)
+                break;
+
+            if (index >= learner.no_of_input_fields)
                 return Py_BuildValue("i", -8);
-            }
 
             if (learner.field_length[index] == 0) {
-                if (!PyFloat_Check(next)) {
-                    /* error, we were expecting a floating point value */
+                /* error, we were expecting a floating point value */
+                if (!PyFloat_Check(next))
                     return Py_BuildValue("i", -9);
-                }
+
                 value = (float)PyFloat_AsDouble(next);
                 range = learner.input_range_max[index] - learner.input_range_min[index];
                 if (range > 0.001f) {
                     normalised = (((value - learner.input_range_min[index])/range)*0.5f) + 0.25f;
-                    if (normalised < 0.25f) {
+                    if (normalised < 0.25f)
                         normalised = 0.25f;
-                    }
-                    if (normalised > 0.75f) {
+
+                    if (normalised > 0.75f)
                         normalised = 0.75f;
-                    }
+
                     deeplearn_set_input_field(&learner, index, normalised);
                 }
             }
             else {
 #ifdef LIBDEEP_PYTHON2
-                if (!PyString_Check(next)) {
-                    /* error, we were expecting a string value */
+                /* error, we were expecting a string value */
+                if (!PyString_Check(next))
                     return Py_BuildValue("i", -10);
-                }
+
                 text = PyString_AsString(next);
 #else
-                if (!PyUnicode_Check(next)) {
-                    /* error, we were expecting a string value */
+                /* error, we were expecting a string value */
+                if (!PyUnicode_Check(next))
                     return Py_BuildValue("i", -10);
-                }
+
                 text = PyBytes_AS_STRING(next);
 #endif
                 deeplearn_set_input_field_text(&learner, index, text);
@@ -496,18 +478,19 @@ static PyObject* test(PyObject* self, PyObject* args)
 
             index++;
         }
-        if (index != learner.no_of_input_fields) {
+
+        if (index != learner.no_of_input_fields)
             return Py_BuildValue("i", -11);
-        }
+
         /*
         printf("\n");
         for (index = 0; index < learner.net->NoOfInputs; index++) {
-            if (learner.net->inputs[index]->value > 0.6f) {
+            if (learner.net->inputs[index]->value > 0.6f)
                 printf("1");
-            }
-            if (learner.net->inputs[index]->value < 0.4f) {
+
+            if (learner.net->inputs[index]->value < 0.4f)
                 printf("0");
-            }
+
             if ((learner.net->inputs[index]->value > 0.4f) &&
                 (learner.net->inputs[index]->value < 0.6f)) {
                 printf("-");
@@ -525,9 +508,10 @@ static PyObject* test(PyObject* self, PyObject* args)
         value = deeplearn_get_output(&learner, index);
         range = learner.output_range_max[index] - learner.output_range_min[index];
         normalised = -9999;
-        if (range > 0.001f) {
+
+        if (range > 0.001f)
             normalised = (((value - 0.25f)/0.5f)*range) + learner.output_range_min[index];
-        }
+
         item = PyFloat_FromDouble((double)normalised);
         PyList_SET_ITEM(pylist, index, item);
     }
@@ -540,14 +524,14 @@ static PyObject* setOutput(PyObject* self, PyObject* args)
     int index=0;
     float value=0;
 
-    if (initialised == 0) {
+    if (initialised == 0)
         return Py_BuildValue("i", -1);
-    }
 
     if (!PyArg_ParseTuple(args, "if", &index, &value))
         return Py_BuildValue("i", -2);
 
     deeplearn_set_output(&learner, index, value);
+
     return Py_BuildValue("i", 0);
 }
 
@@ -555,13 +539,14 @@ static PyObject* setHistoryPlotInterval(PyObject* self, PyObject* args)
 {
     int interval=0;
 
-    if (initialised == 0) {
+    if (initialised == 0)
         return Py_BuildValue("i", -1);
-    }
+
     if (!PyArg_ParseTuple(args, "i", &interval))
         return Py_BuildValue("i", -2);
 
     learner.history_plot_interval = interval;
+
     return Py_BuildValue("i", 0);
 }
 
@@ -569,13 +554,14 @@ static PyObject* setPlotTitle(PyObject* self, PyObject* args)
 {
     char * title;
 
-    if (initialised == 0) {
+    if (initialised == 0)
         return Py_BuildValue("i", -1);
-    }
+
     if (!PyArg_ParseTuple(args, "s", &title))
         return Py_BuildValue("i", -2);
 
     sprintf(learner.history_plot_title,"%s",title);
+
     return Py_BuildValue("i", 0);
 }
 
@@ -594,25 +580,23 @@ static PyObject* readCsvFile(PyObject* self, PyObject* args)
 
     /* get the field indexes of outputs */
     PyObject *iter = PyObject_GetIter(obj);
-    if (!iter) {
+    if (!iter)
         return Py_BuildValue("i", -2);
-    }
 
     while (1) {
         PyObject *next = PyIter_Next(iter);
-        if (!next) {
-            /* nothing left in the iterator */
-            break;
-        }
 
+        /* nothing left in the iterator */
+        if (!next)
+            break;
+
+        /* error, we were expecting an integer value */
 #ifdef LIBDEEP_PYTHON2
-        if (!PyInt_Check(next)) {
+        if (!PyInt_Check(next))
 #else
-        if (!PyLong_Check(next)) {
+        if (!PyLong_Check(next))
 #endif
-            /* error, we were expecting an integer value */
             return Py_BuildValue("i", -4);
-        }
 
 #ifdef LIBDEEP_PYTHON2
         output_field_index[no_of_outputs++] = (int)PyInt_AsLong(next);
@@ -621,9 +605,8 @@ static PyObject* readCsvFile(PyObject* self, PyObject* args)
 #endif
     }
 
-    if (no_of_outputs == 0) {
+    if (no_of_outputs == 0)
         return Py_BuildValue("i", -5);
-    }
 
     retval = deeplearndata_read_csv(filename, &learner,
                                     no_of_hiddens, hidden_layers,
@@ -639,29 +622,25 @@ static PyObject* getOutput(PyObject* self, PyObject* args)
 {
     int index=0;
 
-    if (initialised == 0) {
+    if (initialised == 0)
         return Py_BuildValue("i", -1);
-    }
 
     if (!PyArg_ParseTuple(args, "i", &index))
         return Py_BuildValue("i", -2);
 
-    if (index < 0) {
+    if (index < 0)
         return Py_BuildValue("i", -3);
-    }
 
-    if (index >= learner.net->NoOfOutputs) {
+    if (index >= learner.net->NoOfOutputs)
         return Py_BuildValue("i", -4);
-    }
 
     return Py_BuildValue("f", deeplearn_get_output(&learner, index));
 }
 
 static PyObject* getClass(PyObject* self, PyObject* args)
 {
-    if (initialised == 0) {
+    if (initialised == 0)
         return Py_BuildValue("i", -1);
-    }
 
     return Py_BuildValue("i", deeplearn_get_class(&learner));
 }
@@ -669,13 +648,11 @@ static PyObject* getClass(PyObject* self, PyObject* args)
 static PyObject* setClass(PyObject* self, PyObject* args)
 {
     int class = 0;
-    if (initialised == 0) {
+    if (initialised == 0)
         return Py_BuildValue("i", -1);
-    }
 
-    if (!PyArg_ParseTuple(args, "i", &class)) {
+    if (!PyArg_ParseTuple(args, "i", &class))
         return Py_BuildValue("i", -2);
-    }
 
     deeplearn_set_class(&learner, class);
     return Py_BuildValue("i", 0);
@@ -686,42 +663,38 @@ static PyObject* setOutputs(PyObject* self, PyObject* args)
     PyObject *obj;
     int index = 0;
 
-    if (initialised == 0) {
+    if (initialised == 0)
         return Py_BuildValue("i", -1);
-    }
 
-    if (!PyArg_ParseTuple(args, "O", &obj)) {
+    if (!PyArg_ParseTuple(args, "O", &obj))
         return Py_BuildValue("i", -2);
-    }
 
     PyObject *iter = PyObject_GetIter(obj);
-    if (!iter) {
+
+    if (!iter)
         return Py_BuildValue("i", -3);
-    }
 
     while (1) {
         PyObject *next = PyIter_Next(iter);
-        if (!next) {
-            /* nothing left in the iterator */
+
+        /* nothing left in the iterator */
+        if (!next)
             break;
-        }
 
-        if (index >= learner.net->NoOfOutputs) {
+        if (index >= learner.net->NoOfOutputs)
             return Py_BuildValue("i", -4);
-        }
 
-        if (!PyFloat_Check(next)) {
-            /* error, we were expecting a floating point value */
+        /* error, we were expecting a floating point value */
+        if (!PyFloat_Check(next))
             return Py_BuildValue("i", -5);
-        }
 
         double value = PyFloat_AsDouble(next);
         deeplearn_set_output(&learner, index, (float)value);
         index++;
     }
-    if (index != learner.net->NoOfOutputs) {
+
+    if (index != learner.net->NoOfOutputs)
         return Py_BuildValue("i", -6);
-    }
 
     return Py_BuildValue("i", 0);
 }
@@ -731,9 +704,9 @@ static PyObject* save(PyObject* self, PyObject* args)
     FILE * fp;
     char * filename;
 
-    if (initialised == 0) {
+    if (initialised == 0)
         return Py_BuildValue("i", -1);
-    }
+
     if (!PyArg_ParseTuple(args, "s", &filename))
         return Py_BuildValue("i", -2);
 
@@ -775,9 +748,8 @@ static PyObject* plotHistory(PyObject* self, PyObject* args)
     char * title;
     int image_width=640, image_height=200;
 
-    if (initialised == 0) {
+    if (initialised == 0)
         return Py_BuildValue("i", -1);
-    }
 
     if (!PyArg_ParseTuple(args, "ssii", &filename, &title, &image_width, &image_height))
         return Py_BuildValue("i", -2);
@@ -793,9 +765,8 @@ static PyObject* plotHistory(PyObject* self, PyObject* args)
 /* performs a single training step */
 static PyObject* training(PyObject* self, PyObject* args)
 {
-    if (initialised == 0) {
+    if (initialised == 0)
         return Py_BuildValue("i", -1);
-    }
 
     return Py_BuildValue("i", deeplearndata_training(&learner));
 }
@@ -803,9 +774,8 @@ static PyObject* training(PyObject* self, PyObject* args)
 /* returns the test set performance as a percentage */
 static PyObject* getPerformance(PyObject* self, PyObject* args)
 {
-    if (initialised == 0) {
+    if (initialised == 0)
         return Py_BuildValue("i", -1);
-    }
 
     return Py_BuildValue("f", deeplearndata_get_performance(&learner));
 }
@@ -814,9 +784,8 @@ static PyObject* export(PyObject* self, PyObject* args)
 {
     char * filename;
 
-    if (initialised == 0) {
+    if (initialised == 0)
         return Py_BuildValue("i", -1);
-    }
 
     if (!PyArg_ParseTuple(args, "s", &filename))
         return Py_BuildValue("i", -2);
@@ -826,9 +795,8 @@ static PyObject* export(PyObject* self, PyObject* args)
 
 static PyObject* deallocate(PyObject* self, PyObject* args)
 {
-    if (initialised == 0) {
+    if (initialised == 0)
         return Py_BuildValue("i", -1);
-    }
 
     deeplearn_free(&learner);
     initialised = 0;
