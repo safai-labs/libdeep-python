@@ -49,6 +49,7 @@ static PyObject* getErrorThreshold(PyObject* self, PyObject* args)
 
     if (!PyArg_ParseTuple(args, "i", &index))
         return Py_BuildValue("i", -2);
+
     return Py_BuildValue("f", deeplearn_get_error_threshold(&learner,index));
 }
 
@@ -492,9 +493,8 @@ static PyObject* test(PyObject* self, PyObject* args)
                 printf("0");
 
             if ((learner.net->inputs[index]->value > 0.4f) &&
-                (learner.net->inputs[index]->value < 0.6f)) {
+                (learner.net->inputs[index]->value < 0.6f))
                 printf("-");
-            }
         }
         printf("\n"); */
     }
@@ -655,6 +655,7 @@ static PyObject* setClass(PyObject* self, PyObject* args)
         return Py_BuildValue("i", -2);
 
     deeplearn_set_class(&learner, class);
+
     return Py_BuildValue("i", 0);
 }
 
