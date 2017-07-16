@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 
 # libdeep-python - Python interface for libdeep
-# Copyright (C) 2015-2016  Bob Mottram <bob@robotics.uk.to>
+# Copyright (C) 2015-2017  Bob Mottram <bob@freedombone.net>
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
