@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 import deeplearn
 
@@ -8,7 +8,7 @@ no_of_classes = 3
 # Reads a number of data samples from a CSV file
 # where the expected output value is the fifth field (index 4)
 noOfSamples = deeplearn.readCsvFile("iris.data", 16, 3, [4], no_of_classes)
-print str(noOfSamples) + " samples loaded"
+print(str(noOfSamples) + " samples loaded")
 
 # The error threshold (percent) for each layer of the network.
 # After going below the threshold the pre-training will move
@@ -27,20 +27,20 @@ deeplearn.setPlotTitle("Iris Species Classification Training")
 # The number of time steps after which the training error image is redrawn
 deeplearn.setHistoryPlotInterval(500000)
 
-print "Training started"
+print("Training started")
 
 timeStep = 0
 while (deeplearn.training() != 0):
     timeStep = timeStep + 1
 
-print "Training Completed"
-print "Test data set performance is " + str(deeplearn.getPerformance()) + "%";
+print("Training Completed")
+print("Test data set performance is " + str(deeplearn.getPerformance()) + "%")
 
 deeplearn.export("result.py")
-print "Exported trained network"
+print("Exported trained network")
 
 deeplearn.save("result.nn")
-print "Saved trained network"
+print("Saved trained network")
 
 deeplearn.free();
-print "Done"
+print("Done")

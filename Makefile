@@ -2,11 +2,11 @@ APP=libdeep-python
 PREFIX?=/usr/local
 
 all:
-	python2 src/setup.py build_ext --inplace
+	python3 src/setup.py build_ext --inplace
 debug:
-	python2 src/setup.py build_ext --inplace
+	python3 src/setup.py build_ext --inplace
 install:
-	python2 src/setup.py install
+	python3 src/setup.py install
 	mkdir -m 755 -p ${DESTDIR}${PREFIX}/share/man/man1
 	install -m 644 man/${APP}.1.gz ${DESTDIR}${PREFIX}/share/man/man1
 uninstall:

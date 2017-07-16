@@ -10,7 +10,7 @@ Installation
 To install dependencies on a Debian based system:
 
 ``` bash
-sudo apt-get install build-essential gnuplot doxygen python-dev
+sudo apt-get install build-essential gnuplot doxygen python3-dev
 ```
 
 Or on an Arch based system:

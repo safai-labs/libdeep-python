@@ -1,11 +1,11 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 import deeplearn
 
 # Reads a number of data samples from a CSV file
 # where the expected output value is the 12th field (index 11)
 noOfSamples = deeplearn.readCsvFile("winequality-white.csv", 10, 3, [11], 0)
-print str(noOfSamples) + " samples loaded"
+print(str(noOfSamples) + " samples loaded")
 
 # The error threshold (percent) for each layer of the network.
 # Three hidden layers, plus the final training.
@@ -25,20 +25,20 @@ deeplearn.setPlotTitle("White Wine Quality Training")
 # The number of time steps after which the training error image is redrawn
 deeplearn.setHistoryPlotInterval(500000)
 
-print "Training started"
+print("Training started")
 
 timeStep = 0
 while (deeplearn.training() != 0):
     timeStep = timeStep + 1
 
-print "Training Completed"
-print "Test data set performance is " + str(deeplearn.getPerformance()) + "%";
+print("Training Completed")
+print("Test data set performance is " + str(deeplearn.getPerformance()) + "%")
 
 deeplearn.export("result.py")
-print "Exported trained network"
+print("Exported trained network")
 
 deeplearn.save("result.nn")
-print "Saved trained network"
+print("Saved trained network")
 
 deeplearn.free();
-print "Done"
+print("Done")

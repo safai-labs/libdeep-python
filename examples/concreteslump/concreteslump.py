@@ -1,11 +1,11 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 import deeplearn
 
 # Reads a number of data samples from a CSV file
 # where the expected output values are within field indexes 7,8,9 and 10
 noOfSamples = deeplearn.readCsvFile("slump_test.data", 16, 3, [7,8,9,10], 0)
-print str(noOfSamples) + " samples loaded"
+print(str(noOfSamples) + " samples loaded")
 
 # The error threshold (percent) for each layer of the network.
 # Three hidden layers, plus the final training.
@@ -25,20 +25,20 @@ deeplearn.setPlotTitle("Concrete Slump Training")
 # The number of time steps after which the training error image is redrawn
 deeplearn.setHistoryPlotInterval(900000)
 
-print "Training started"
+print("Training started")
 
 timeStep = 0
 while (deeplearn.training() != 0):
     timeStep = timeStep + 1
 
-print "Training Completed"
-print "Test data set performance is " + str(deeplearn.getPerformance()) + "%";
+print("Training Completed")
+print("Test data set performance is " + str(deeplearn.getPerformance()) + "%")
 
 deeplearn.export("result.py")
-print "Exported trained network"
+print("Exported trained network")
 
 deeplearn.save("result.nn")
-print "Saved trained network"
+print("Saved trained network")
 
 deeplearn.free();
-print "Done"
+print("Done")

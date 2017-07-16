@@ -34,6 +34,8 @@
 #include <libdeep/deeplearn.h>
 #include <libdeep/deeplearndata.h>
 
+#undef LIBDEEP_PYTHON2
+
 static int initialised = 0;
 static deeplearn learner;
 static unsigned int random_seed = 46362;
@@ -336,7 +338,11 @@ static PyObject* setFields(PyObject* self, PyObject* args)
             deeplearn_set_input_field(&learner, index, (float)value);
         }
         else {
+#ifdef LIBDEEP_PYTHON2
             char * text = PyString_AsString(next);
+#else
+            char * text = PyBytes_AS_STRING(next);
+#endif
             deeplearn_set_input_field_text(&learner, index, text);
         }
 
@@ -472,11 +478,19 @@ static PyObject* test(PyObject* self, PyObject* args)
                 }
             }
             else {
+#ifdef LIBDEEP_PYTHON2
                 if (!PyString_Check(next)) {
                     /* error, we were expecting a string value */
                     return Py_BuildValue("i", -10);
                 }
                 text = PyString_AsString(next);
+#else
+                if (!PyUnicode_Check(next)) {
+                    /* error, we were expecting a string value */
+                    return Py_BuildValue("i", -10);
+                }
+                text = PyBytes_AS_STRING(next);
+#endif
                 deeplearn_set_input_field_text(&learner, index, text);
             }
 
@@ -591,12 +605,20 @@ static PyObject* readCsvFile(PyObject* self, PyObject* args)
             break;
         }
 
+#ifdef LIBDEEP_PYTHON2
         if (!PyInt_Check(next)) {
+#else
+        if (!PyLong_Check(next)) {
+#endif
             /* error, we were expecting an integer value */
             return Py_BuildValue("i", -4);
         }
 
+#ifdef LIBDEEP_PYTHON2
         output_field_index[no_of_outputs++] = (int)PyInt_AsLong(next);
+#else
+        output_field_index[no_of_outputs++] = (int)PyLong_AsLong(next);
+#endif
     }
 
     if (no_of_outputs == 0) {
@@ -856,8 +878,24 @@ static PyMethodDef DeeplearnMethods[] =
 };
 
 /* module initialization */
+
+#ifdef LIBDEEP_PYTHON2
 PyMODINIT_FUNC
 
 initdeeplearn(void) {
     (void) Py_InitModule("deeplearn", DeeplearnMethods);
 }
+#else
+static struct PyModuleDef moduledef = {
+   PyModuleDef_HEAD_INIT,
+   "deeplearn",
+   NULL,
+   -1,
+   DeeplearnMethods
+};
+
+PyMODINIT_FUNC
+PyInit_deeplearn(void) {
+    return PyModule_Create(&moduledef);
+}
+#endif

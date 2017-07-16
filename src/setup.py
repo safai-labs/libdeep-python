@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 # libdeep-python - Python interface for libdeep
 # Copyright (C) 2015-2017  Bob Mottram <bob@freedombone.net>
