@@ -66,7 +66,7 @@ static PyObject* backpropError(PyObject* self, PyObject* args)
     if (initialised == 0)
         return Py_BuildValue("i", -1);
 
-    return Py_BuildValue("f", learner.BPerror);
+    return Py_BuildValue("f", learner.backprop_error);
 }
 
 static PyObject* inputs(PyObject* self, PyObject* args)
@@ -74,7 +74,7 @@ static PyObject* inputs(PyObject* self, PyObject* args)
     if (initialised == 0)
         return Py_BuildValue("i", -1);
 
-    return Py_BuildValue("i", learner.net->NoOfInputs);
+    return Py_BuildValue("i", learner.net->no_of_inputs);
 }
 
 static PyObject* outputs(PyObject* self, PyObject* args)
@@ -82,7 +82,7 @@ static PyObject* outputs(PyObject* self, PyObject* args)
     if (initialised == 0)
         return Py_BuildValue("i", -1);
 
-    return Py_BuildValue("i", learner.net->NoOfOutputs);
+    return Py_BuildValue("i", learner.net->no_of_outputs);
 }
 
 static PyObject* hiddens(PyObject* self, PyObject* args)
@@ -90,7 +90,7 @@ static PyObject* hiddens(PyObject* self, PyObject* args)
     if (initialised == 0)
         return Py_BuildValue("i", -1);
 
-    return Py_BuildValue("i", learner.net->NoOfHiddens);
+    return Py_BuildValue("i", learner.net->no_of_hiddens);
 }
 
 static PyObject* layers(PyObject* self, PyObject* args)
@@ -98,7 +98,7 @@ static PyObject* layers(PyObject* self, PyObject* args)
     if (initialised == 0)
         return Py_BuildValue("i", -1);
 
-    return Py_BuildValue("i", learner.net->HiddenLayers);
+    return Py_BuildValue("i", learner.net->hidden_layers);
 }
 
 static PyObject* setErrorThresholds(PyObject* self, PyObject* args)
@@ -281,7 +281,7 @@ static PyObject* setInputs(PyObject* self, PyObject* args)
         if (!next)
             break;
 
-        if (index >= learner.net->NoOfInputs)
+        if (index >= learner.net->no_of_inputs)
             return Py_BuildValue("i", -4);
 
         /* error, we were expecting a floating point value */
@@ -293,7 +293,7 @@ static PyObject* setInputs(PyObject* self, PyObject* args)
         index++;
     }
 
-    if (index != learner.net->NoOfInputs)
+    if (index != learner.net->no_of_inputs)
         return Py_BuildValue("i", -6);
 
     return Py_BuildValue("i", 0);
@@ -402,7 +402,7 @@ static PyObject* test(PyObject* self, PyObject* args)
             if (!next)
                 break;
 
-            if (index >= learner.net->NoOfInputs)
+            if (index >= learner.net->no_of_inputs)
                 return Py_BuildValue("i", -4);
 
             /* error, we were expecting a floating point value */
@@ -424,7 +424,7 @@ static PyObject* test(PyObject* self, PyObject* args)
             index++;
         }
 
-        if (index != learner.net->NoOfInputs)
+        if (index != learner.net->no_of_inputs)
             return Py_BuildValue("i", -6);
     }
     else {
@@ -485,7 +485,7 @@ static PyObject* test(PyObject* self, PyObject* args)
 
         /*
         printf("\n");
-        for (index = 0; index < learner.net->NoOfInputs; index++) {
+        for (index = 0; index < learner.net->no_of_inputs; index++) {
             if (learner.net->inputs[index]->value > 0.6f)
                 printf("1");
 
@@ -503,8 +503,8 @@ static PyObject* test(PyObject* self, PyObject* args)
     deeplearn_feed_forward(&learner);
 
     /* return the outputs as a list */
-    pylist = PyList_New(learner.net->NoOfOutputs);
-    for (index = 0; index < learner.net->NoOfOutputs; index++) {
+    pylist = PyList_New(learner.net->no_of_outputs);
+    for (index = 0; index < learner.net->no_of_outputs; index++) {
         value = deeplearn_get_output(&learner, index);
         range = learner.output_range_max[index] - learner.output_range_min[index];
         normalised = -9999;
@@ -631,7 +631,7 @@ static PyObject* getOutput(PyObject* self, PyObject* args)
     if (index < 0)
         return Py_BuildValue("i", -3);
 
-    if (index >= learner.net->NoOfOutputs)
+    if (index >= learner.net->no_of_outputs)
         return Py_BuildValue("i", -4);
 
     return Py_BuildValue("f", deeplearn_get_output(&learner, index));
@@ -682,7 +682,7 @@ static PyObject* setOutputs(PyObject* self, PyObject* args)
         if (!next)
             break;
 
-        if (index >= learner.net->NoOfOutputs)
+        if (index >= learner.net->no_of_outputs)
             return Py_BuildValue("i", -4);
 
         /* error, we were expecting a floating point value */
@@ -694,7 +694,7 @@ static PyObject* setOutputs(PyObject* self, PyObject* args)
         index++;
     }
 
-    if (index != learner.net->NoOfOutputs)
+    if (index != learner.net->no_of_outputs)
         return Py_BuildValue("i", -6);
 
     return Py_BuildValue("i", 0);
