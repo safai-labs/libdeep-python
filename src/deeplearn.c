@@ -731,7 +731,7 @@ static PyObject* load(PyObject* self, PyObject* args)
 
     fp = fopen(filename,"r");
     if (fp) {
-        retval = deeplearn_load(fp, &learner, &random_seed);
+        retval = deeplearn_load(fp, &learner);
         fclose(fp);
         if (retval == 0) {
             initialised = 1;
