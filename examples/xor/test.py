@@ -6,7 +6,7 @@ import deeplearn
 retval = deeplearn.load("result.nn")
 if retval != 0:
     print("Unable to load network. Error code " + str(retval))
-    sys.quit()
+    sys.exit()
 
 print("0,0"),
 if deeplearn.test([0.0,0.0])[0] > 0.5:
