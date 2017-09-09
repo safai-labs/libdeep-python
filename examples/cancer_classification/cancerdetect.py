@@ -10,7 +10,7 @@ print(str(noOfSamples) + " samples loaded")
 # The error threshold (percent) for each layer of the network.
 # After going below the threshold the pre-training will move
 # on to the next layer
-deeplearn.setErrorThresholds([3.0, 3.0, 3.5, 3.0])
+deeplearn.setErrorThresholds([1.0, 1.0, 1.5, 6.0])
 
 # The learning rate in the range 0.0-1.0
 deeplearn.setLearningRate(0.2)

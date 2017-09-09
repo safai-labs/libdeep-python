@@ -30,6 +30,7 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <Python.h>
+#include <omp.h>
 #include <libdeep/globals.h>
 #include <libdeep/deeplearn.h>
 #include <libdeep/deeplearndata.h>
@@ -545,7 +546,7 @@ static PyObject* setHistoryPlotInterval(PyObject* self, PyObject* args)
     if (!PyArg_ParseTuple(args, "i", &interval))
         return Py_BuildValue("i", -2);
 
-    learner.history_plot_interval = interval;
+    learner.history.interval = interval;
 
     return Py_BuildValue("i", 0);
 }
@@ -560,7 +561,7 @@ static PyObject* setPlotTitle(PyObject* self, PyObject* args)
     if (!PyArg_ParseTuple(args, "s", &title))
         return Py_BuildValue("i", -2);
 
-    sprintf(learner.history_plot_title,"%s",title);
+    sprintf(learner.history.title,"%s",title);
 
     return Py_BuildValue("i", 0);
 }
@@ -755,8 +756,9 @@ static PyObject* plotHistory(PyObject* self, PyObject* args)
     if (!PyArg_ParseTuple(args, "ssii", &filename, &title, &image_width, &image_height))
         return Py_BuildValue("i", -2);
 
+    strcpy(learner.history.filename, filename);
+    strcpy(learner.history.title, title);
     retval = deeplearn_plot_history(&learner,
-                                    filename, title,
                                     image_width,
                                     image_height);
 
