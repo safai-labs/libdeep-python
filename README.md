@@ -10,13 +10,13 @@ Installation
 To install dependencies on a Debian based system:
 
 ``` bash
-sudo apt-get install build-essential gnuplot doxygen python3-dev
+sudo apt-get install build-essential doxygen python3-dev
 ```
 
 Or on an Arch based system:
 
 ``` bash
-sudo pacman -S gcc gnuplot doxygen
+sudo pacman -S gcc doxygen
 ```
 
 Then install libdeep:
