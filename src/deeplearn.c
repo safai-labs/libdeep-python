@@ -561,7 +561,7 @@ static PyObject* setPlotTitle(PyObject* self, PyObject* args)
     if (!PyArg_ParseTuple(args, "s", &title))
         return Py_BuildValue("i", -2);
 
-    sprintf(learner.history.title,"%s",title);
+    deeplearn_set_title(&learner, title);
 
     return Py_BuildValue("i", 0);
 }
@@ -838,7 +838,7 @@ static PyMethodDef DeeplearnMethods[] =
     {"layers", layers, METH_VARARGS, "Returns the number of hidden layers"},
     {"readCsvFile", readCsvFile, METH_VARARGS, "Reads the data from a csv file"},
     {"setHistoryPlotInterval", setHistoryPlotInterval, METH_VARARGS, "Sets the number of time steps after which to update the training history"},
-    {"setPlotTitle", setPlotTitle, METH_VARARGS, "Sets the title of the training history graph"},
+    {"setPlotTitle", setPlotTitle, METH_VARARGS, "Sets the title of the training graphs"},
     {"training", training, METH_VARARGS, "Performs a training step"},
     {"getPerformance", getPerformance, METH_VARARGS, "Returns the test set performance as a percentage"},
     {"export", export, METH_VARARGS, "Exports the trained network as a standalone C program"},
